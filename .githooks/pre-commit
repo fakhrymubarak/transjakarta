@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+MSG_FILE=$(git rev-parse --git-path COMMIT_EDITMSG)
+if [ -f "$MSG_FILE" ] && [ -s "$MSG_FILE" ]; then
+    if ! grep -Eq '^(feat|fix|docs|chore|refactor|test): ' "$MSG_FILE"; then
+        echo "Commit message must start with one of: feat:, fix:, docs:, chore:, refactor:, test:" >&2
+        exit 1
+    fi
+fi
+
+./gradlew ktlintCheck test

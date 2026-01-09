@@ -38,3 +38,17 @@
 ## Configuration Tips
 - Ensure `local.properties` points to your Android SDK path when building locally.
 - Keep API keys out of source; prefer Gradle properties or CI secrets.
+
+## Git Hooks
+- Shared hooks live in `.githooks/`; enable them with:
+  - `git config core.hooksPath .githooks`
+- Hooks enforce commit message prefixes and run:
+  - `pre-commit`: `./gradlew ktlintCheck test`
+  - `pre-push`: `./gradlew test koverVerify`
+
+## Git Hooks
+- Shared hooks live in `.githooks/`; enable them with:
+  - `git config core.hooksPath .githooks`
+- Hooks enforce commit message prefixes and run:
+  - `pre-commit`: `./gradlew ktlintCheck test`
+  - `pre-push`: `./gradlew test koverVerify`
