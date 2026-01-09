@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Transjakarta"
 include(":app")
+includeBuild("build-logic")
  
