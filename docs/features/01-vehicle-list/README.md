@@ -31,18 +31,18 @@ Provide the main vehicle list in a card-based layout with pagination and pull-to
 - Local: in-memory list cache and paging state (offset, hasNext).
 
 ## Architecture
-- Presentation: Jetpack Compose `LazyColumn`, `VehicleCard`, and pull-to-refresh indicator.
+- Presentation: MVVM screen using Jetpack Compose `LazyColumn`, `VehicleCard`, and pull-to-refresh indicator.
 - Domain: `FetchVehiclesPage` use case.
-- Data: `VehicleRepository` backed by MBTA API client (Retrofit/OkHttp) and DTO mapping.
+- Data: `VehicleRepository` backed by MBTA API client (Retrofit + OkHttp) and Kotlinx Serialization models.
 
 ## Dependencies
 - Retrofit + OkHttp for REST calls.
-- Kotlinx Serialization or Moshi for JSON parsing.
+- Kotlinx Serialization for JSON parsing.
 - Jetpack Compose Material3 for UI components.
 
 ## State management
 - `VehicleListViewModel` owns list state, pagination offset, loading flags, and errors.
-- Expose a single `UiState` to the screen to drive loading/empty/error/content states.
+- Expose a single `UiState` via `StateFlow` to drive loading/empty/error/content states.
 
 ## Error handling
 - Initial load failure: show full-screen error with retry.

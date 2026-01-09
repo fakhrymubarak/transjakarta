@@ -32,17 +32,19 @@ Enable multi-select filtering by route and trip so users can narrow the vehicle 
 - Local: selected filter IDs stored in ViewModel; optional persistence in DataStore.
 
 ## Architecture
-- Presentation: Compose filter sheet with multi-select chips or checkboxes.
+- Presentation: MVVM screen using Compose filter sheet with multi-select chips or checkboxes.
 - Domain: `FetchRoutes`, `FetchTrips`, and `ApplyVehicleFilters` use cases.
-- Data: `RouteRepository`, `TripRepository`, and `VehicleRepository`.
+- Data: `RouteRepository`, `TripRepository`, and `VehicleRepository` using Retrofit + OkHttp and Kotlinx Serialization.
 
 ## Dependencies
+- Retrofit + OkHttp for REST calls.
+- Kotlinx Serialization for JSON parsing.
+- Jetpack Compose Material3 for UI components.
 - Optional DataStore for persisting selections.
-- Reuse existing networking stack (Retrofit/OkHttp).
 
 ## State management
 - `FilterViewModel` holds selected routeIds/tripIds and loading/error states for options.
-- Applied filters are exposed to the list screen via shared state or navigation result.
+- Expose selection state via `StateFlow` and pass applied filters via shared state or navigation result.
 
 ## Error handling
 - If routes or trips fail to load, show error with retry and keep filters disabled.

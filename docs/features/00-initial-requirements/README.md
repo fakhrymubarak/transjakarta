@@ -9,7 +9,11 @@ Build a native android application for fleet management that integrates with the
 ## Technology Stack
 - Android Native Kotlin
 - REST API integration
-- Atomic Components using jetpack compose
+- Atomic Components using Jetpack Compose
+- MVVM with Jetpack ViewModel and StateFlow
+- Retrofit + OkHttp for networking
+- Kotlinx Serialization for JSON
+- Google Maps SDK for Android
 
 ## API Integrations
 Primary API specification: `docs/api/swagger.json` (Swagger 2.0, MBTA API v3.0)
@@ -53,7 +57,7 @@ Additional APIs for filters (see `docs/api/swagger.json`):
   - Route data
 - Trip data
 - Any additional relevant fields
-- Show vehicle position on a map (e.g., MapLibre or Google Maps).
+- Show vehicle position on a map using Google Maps SDK for Android.
 
 ## Non-Functional Requirements
 - All screens must display a loading indicator during data fetches.

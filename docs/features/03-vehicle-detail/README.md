@@ -31,17 +31,19 @@ Provide a detailed view for a selected vehicle, including status, location, rout
 - Local: pass summary data from list to render immediately.
 
 ## Architecture
-- Presentation: Compose detail layout and map composable.
+- Presentation: MVVM screen using Compose detail layout and Google Maps composable.
 - Domain: `FetchVehicleDetail` use case.
-- Data: `VehicleRepository` with detail endpoint and mapping.
+- Data: `VehicleRepository` with detail endpoint and Kotlinx Serialization models.
 
 ## Dependencies
-- Reuse networking stack (Retrofit/OkHttp).
-- Map SDK (Google Maps or MapLibre Android).
+- Retrofit + OkHttp for REST calls.
+- Kotlinx Serialization for JSON parsing.
+- Jetpack Compose Material3 for UI components.
+- Google Maps SDK for Android (Maps Compose or MapView interop).
 
 ## State management
 - `VehicleDetailViewModel` holds detail state, loading, and error status.
-- Use cached list data for optimistic render, then refresh with detail response.
+- Expose detail state via `StateFlow` and render cached list data before refresh.
 
 ## Error handling
 - If detail fetch fails, show error with retry and keep cached data visible.
@@ -67,5 +69,5 @@ Provide a detailed view for a selected vehicle, including status, location, rout
 - None.
 
 ## Open questions
-- Which map provider should we use (Google Maps vs MapLibre)?
 - Do we need periodic refresh for detail data?
+- What default zoom/tilt and interaction controls should the map use?

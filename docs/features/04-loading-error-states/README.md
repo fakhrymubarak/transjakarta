@@ -30,15 +30,15 @@ Define consistent loading and error behaviors across all screens to meet UX requ
 - Local: cached summaries where available.
 
 ## Architecture
-- Presentation: shared Compose components for loading and error UI.
+- Presentation: shared Compose components for loading and error UI in MVVM screens.
 - Domain: unified `UiState` model for loading, content, empty, and error.
 - Data: no additional data layers.
 
 ## Dependencies
-- None beyond existing UI framework.
+- Jetpack Compose Material3 for shared loading/error components.
 
 ## State management
-- Each screen ViewModel exposes a `UiState` with `isLoading`, `errorMessage`, and `content`.
+- Each screen ViewModel exposes a `UiState` via `StateFlow` with `isLoading`, `errorMessage`, and `content`.
 
 ## Error handling
 - Use concise, user-friendly messages; include retry CTA.
