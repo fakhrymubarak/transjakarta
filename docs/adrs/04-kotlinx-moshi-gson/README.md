@@ -19,7 +19,7 @@
 - [References](#references)
 
 ## Context
-We need a single JSON serialization library for Android projects to ensure consistent models, nullability handling, and integration with networking (Retrofit/Ktor). The choice should favor Kotlin-first support and, if relevant, and potential multiplatform reuse.
+We need a single JSON serialization library for Android projects to ensure consistent models, nullability handling, and integration with networking (Retrofit/Ktor). The choice should favor Kotlin-first support and, if relevant, potential multiplatform reuse.
 
 ## Decision
 We will use Kotlinx Serialization as the default JSON serialization library for new Android Kotlin code.

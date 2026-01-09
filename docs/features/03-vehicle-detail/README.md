@@ -1,7 +1,7 @@
 # Vehicle Detail
 
-- Status: Draft
-- Owner: TBD
+- Status: Good to go
+- Owner: Fakhry
 - Last updated: 09/01/2026
 
 ## Overview
@@ -62,12 +62,12 @@ Provide a detailed view for a selected vehicle, including status, location, rout
 
 ## Testing plan
 - Unit: mapping of detail response to UI model.
-- Widget: detail screen renders fields correctly.
+- UI: detail screen renders fields correctly.
 - Integration: `GET /vehicles/{id}` with includes.
 
 ## Rollout/flags
 - None.
 
-## Open questions
-- Do we need periodic refresh for detail data?
-- What default zoom/tilt and interaction controls should the map use?
+## Decisions
+- No background polling; refresh on screen entry and provide a manual refresh action if needed.
+- Map defaults: center on vehicle, zoom 15, tilt 0, rotation disabled, pan/zoom enabled.

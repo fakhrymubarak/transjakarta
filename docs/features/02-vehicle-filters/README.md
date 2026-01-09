@@ -1,7 +1,7 @@
 # Vehicle Filters (Route and Trip)
 
-- Status: Draft
-- Owner: TBD
+- Status: Good to go
+- Owner: Fakhry
 - Last updated: 09/01/2026
 
 ## Overview
@@ -27,9 +27,10 @@ Enable multi-select filtering by route and trip so users can narrow the vehicle 
 - Filter Sheet: route and trip multi-select controls.
 
 ## Data sources
-- Remote: `GET /routes`, `GET /trips` for filter options.
+- Remote: `GET /routes` for route options.
+- Remote: `GET /trips` for trip options with `filter[route]`, optional `filter[name]`, and paging when needed.
 - Remote: `GET /vehicles` with `filter[route]` and `filter[trip]` (comma-separated IDs).
-- Local: selected filter IDs stored in ViewModel; optional persistence in DataStore.
+- Local: selected filter IDs stored in ViewModel (in-memory only).
 
 ## Architecture
 - Presentation: MVVM screen using Compose filter sheet with multi-select chips or checkboxes.
@@ -40,11 +41,11 @@ Enable multi-select filtering by route and trip so users can narrow the vehicle 
 - Retrofit + OkHttp for REST calls.
 - Kotlinx Serialization for JSON parsing.
 - Jetpack Compose Material3 for UI components.
-- Optional DataStore for persisting selections.
 
 ## State management
 - `FilterViewModel` holds selected routeIds/tripIds and loading/error states for options.
 - Expose selection state via `StateFlow` and pass applied filters via shared state or navigation result.
+- Selections reset on app restart (no persistence in v1).
 
 ## Error handling
 - If routes or trips fail to load, show error with retry and keep filters disabled.
@@ -64,12 +65,12 @@ Enable multi-select filtering by route and trip so users can narrow the vehicle 
 
 ## Testing plan
 - Unit: build query params for `filter[route]` and `filter[trip]`.
-- Widget: multi-select UI selection and clear.
+- UI: multi-select UI selection and clear.
 - Integration: filtered `GET /vehicles` results.
 
 ## Rollout/flags
 - None.
 
-## Open questions
-- Should we support search or pagination for large route/trip lists?
-- Should filter selections persist across app restarts?
+## Decisions
+- Add search: route list uses client-side search; trip list uses `filter[name]` and `filter[route]` with paging as needed.
+- Filters do not persist across app restarts (in-memory only for v1).

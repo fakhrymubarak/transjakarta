@@ -26,6 +26,11 @@ Additional APIs for filters (see `docs/api/swagger.json`):
 - Routes: `/routes`
 - Trips: `/trips`
 
+## Navigation
+- Dashboard uses bottom navigation with two tabs:
+  - List: vehicle list and pagination.
+  - Maps: live tracking screen.
+
 ## Functional Requirements
 
 ### 1) Vehicle Data Retrieval
@@ -55,10 +60,12 @@ Additional APIs for filters (see `docs/api/swagger.json`):
   - Latitude and longitude
   - Last updated timestamp
   - Route data
-- Trip data
-- Any additional relevant fields
+  - Trip data
+  - Any additional relevant fields
 - Show vehicle position on a map using Google Maps SDK for Android.
+- Route and trip data are fetched on the detail screen only.
 
 ## Non-Functional Requirements
 - All screens must display a loading indicator during data fetches.
 - Errors must show a clear, user-friendly message.
+- Google Maps API key must be stored in secrets and never hardcoded or committed.

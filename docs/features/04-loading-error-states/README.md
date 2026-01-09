@@ -1,7 +1,7 @@
 # Loading and Error States
 
-- Status: Draft
-- Owner: TBD
+- Status: Good to go
+- Owner: Fakhry
 - Last updated: 09/01/2026
 
 ## Overview
@@ -43,6 +43,7 @@ Define consistent loading and error behaviors across all screens to meet UX requ
 ## Error handling
 - Use concise, user-friendly messages; include retry CTA.
 - Surface rate limit errors with a clear wait/retry suggestion.
+- Use full-screen errors for blocking failures, inline errors for pagination, and snackbars for non-blocking issues.
 
 ## Performance considerations
 - Avoid blocking UI thread; use coroutines for fetch operations.
@@ -57,12 +58,15 @@ Define consistent loading and error behaviors across all screens to meet UX requ
 
 ## Testing plan
 - Unit: UI state transitions for loading and error.
-- Widget: error and loading components render correctly.
+- UI: error and loading components render correctly.
 - Integration: simulate network failures and rate limits.
 
 ## Rollout/flags
 - None.
 
-## Open questions
-- Standard copy for common error cases?
-- Should errors use snackbar, dialog, or full-screen layout?
+## Decisions
+- Standard copy examples:
+  - Network: "Unable to load data. Check your connection and try again."
+  - Rate limit: "Too many requests. Please wait a moment and retry."
+  - Unknown: "Something went wrong. Please try again."
+- Error presentation: full-screen for blocking errors, inline for partial errors, snackbars for transient issues (no dialogs).
