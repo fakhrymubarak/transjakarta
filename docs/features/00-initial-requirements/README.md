@@ -51,9 +51,9 @@ Additional APIs for filters (see `docs/api/swagger.json`):
   - Latitude and longitude
   - Last updated timestamp
   - Route data
-  - Trip data
-  - Any additional relevant fields
-- Bonus (optional): show vehicle position on a map (e.g., Leaflet, MapLibre, or Google Maps).
+- Trip data
+- Any additional relevant fields
+- Show vehicle position on a map (e.g., MapLibre or Google Maps).
 
 ## Non-Functional Requirements
 - All screens must display a loading indicator during data fetches.
