@@ -51,6 +51,7 @@ Define the project-wide architecture for a scalable Android codebase using clean
 ├── buildLogic/               # Custom Gradle plugins and conventions
 ├── core/
 │   ├── analytics/            # :core:analytics
+│   ├── designsystem/         # :core:designsystem
 │   ├── networking/           # :core:networking
 │   └── utils/                # :core:utils
 ├── feature/
