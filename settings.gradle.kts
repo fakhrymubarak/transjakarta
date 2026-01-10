@@ -22,5 +22,6 @@ dependencyResolutionManagement {
 rootProject.name = "Transjakarta"
 include(":app")
 include(":core:designsystem")
+include(":core:networking")
+include(":feature:vehicles")
 includeBuild("build-logic")
- 

@@ -1,0 +1,2 @@
+# Api key to increase rate limiting when hitting API
+MBTA_API_KEY=YOUR_API_KEY

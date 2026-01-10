@@ -1,0 +1,16 @@
+object LibraryAliases {
+    const val COMPOSE_BOM = "androidx-compose-bom"
+    const val COMPOSE_MATERIAL3 = "androidx-compose-material3"
+    const val COMPOSE_UI = "androidx-compose-ui"
+    const val COMPOSE_UI_GRAPHICS = "androidx-compose-ui-graphics"
+    const val COMPOSE_UI_TOOLING_PREVIEW = "androidx-compose-ui-tooling-preview"
+    const val COMPOSE_MATERIAL_ICONS_EXTENDED = "androidx-compose-material-icons-extended"
+    const val COMPOSE_UI_TOOLING = "androidx-compose-ui-tooling"
+    const val ANDROIDX_LIFECYCLE_RUNTIME_KTX = "androidx-lifecycle-runtime-ktx"
+    const val ANDROIDX_LIFECYCLE_VIEWMODEL_COMPOSE = "androidx-lifecycle-viewmodel-compose"
+    const val HILT_ANDROID = "hilt-android"
+    const val HILT_COMPILER = "hilt-compiler"
+    const val HILT_NAVIGATION_COMPOSE = "hilt-navigation-compose"
+    const val JUNIT_JUPITER_ENGINE = "junit-jupiter-engine"
+    const val JUNIT_PLATFORM_LAUNCHER = "junit-platform-launcher"
+}
