@@ -18,7 +18,7 @@ data class VehicleDataDto(
     val id: String,
     val type: String? = null,
     val attributes: VehicleAttributesDto? = null,
-    val relationships: RelationshipDto ? = null,
+    val relationships: RelationshipDto? = null,
 )
 
 @Serializable
@@ -59,4 +59,3 @@ data class Data(
     val id: String? = null,
     val type: String? = null,
 )
-

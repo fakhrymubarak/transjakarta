@@ -138,17 +138,16 @@ private fun StatusChip(status: VehicleStatus, label: String, modifier: Modifier 
 private fun VehicleCardPreview() {
     MaterialTheme {
         VehicleCard(
-            vehicle =
-                VehicleUiModel(
-                    id = "1",
-                    label = "1817",
-                    currentStatus = VehicleStatus.IN_TRANSIT_TO,
-                    statusLabel = "In Transit To",
-                    latitude = 42.32941818237305,
-                    longitude = -71.27239990234375,
-                    coordinatesLabel = "42.329418, -71.272400",
-                    updatedAtLabel = "Jan 15, 14:30:00",
-                ),
+            vehicle = VehicleUiModel(
+                id = "1",
+                label = "1817",
+                currentStatus = VehicleStatus.IN_TRANSIT_TO,
+                statusLabel = "In Transit To",
+                latitude = 42.32941818237305,
+                longitude = -71.27239990234375,
+                coordinatesLabel = "42.329418, -71.272400",
+                updatedAtLabel = "Jan 15, 14:30:00",
+            ),
             onClick = {},
             modifier = Modifier.padding(16.dp),
         )
@@ -160,17 +159,16 @@ private fun VehicleCardPreview() {
 private fun VehicleCardStoppedPreview() {
     TransjakartaTheme {
         VehicleCard(
-            vehicle =
-                VehicleUiModel(
-                    id = "2",
-                    label = "1234",
-                    currentStatus = VehicleStatus.STOPPED_AT,
-                    statusLabel = "Stopped At",
-                    latitude = 42.3601,
-                    longitude = -71.0589,
-                    coordinatesLabel = "42.360100, -71.058900",
-                    updatedAtLabel = "Jan 15, 14:32:15",
-                ),
+            vehicle = VehicleUiModel(
+                id = "2",
+                label = "1234",
+                currentStatus = VehicleStatus.STOPPED_AT,
+                statusLabel = "Stopped At",
+                latitude = 42.3601,
+                longitude = -71.0589,
+                coordinatesLabel = "42.360100, -71.058900",
+                updatedAtLabel = "Jan 15, 14:32:15",
+            ),
             onClick = {},
             modifier = Modifier.padding(16.dp),
         )

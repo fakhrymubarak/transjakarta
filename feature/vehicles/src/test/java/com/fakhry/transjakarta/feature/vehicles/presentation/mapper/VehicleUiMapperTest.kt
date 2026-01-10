@@ -2,7 +2,6 @@ package com.fakhry.transjakarta.feature.vehicles.presentation.mapper
 
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Vehicle
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
-import java.util.Locale
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.Locale
 
 class VehicleUiMapperTest {
     private lateinit var previousLocale: Locale
@@ -71,12 +71,11 @@ class VehicleUiMapperTest {
 
     companion object {
         @JvmStatic
-        fun statusCases(): List<Arguments> =
-            listOf(
-                Arguments.of(VehicleStatus.IN_TRANSIT_TO, "In Transit"),
-                Arguments.of(VehicleStatus.STOPPED_AT, "Stopped"),
-                Arguments.of(VehicleStatus.INCOMING_AT, "Incoming"),
-                Arguments.of(VehicleStatus.UNKNOWN, "Unknown"),
-            )
+        fun statusCases(): List<Arguments> = listOf(
+            Arguments.of(VehicleStatus.IN_TRANSIT_TO, "In Transit"),
+            Arguments.of(VehicleStatus.STOPPED_AT, "Stopped"),
+            Arguments.of(VehicleStatus.INCOMING_AT, "Incoming"),
+            Arguments.of(VehicleStatus.UNKNOWN, "Unknown"),
+        )
     }
 }

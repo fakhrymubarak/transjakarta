@@ -9,7 +9,6 @@ data class Vehicle(
     val updatedAt: String,
 )
 
-
 enum class VehicleStatus {
     INCOMING_AT,
     STOPPED_AT,

@@ -2,16 +2,12 @@ package com.fakhry.transjakarta.feature.vehicles.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -21,21 +17,26 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.fakhry.transjakarta.core.designsystem.theme.TransjakartaTheme
+import com.fakhry.transjakarta.feature.vehicles.domain.error.RateLimitException
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.EmptyContent
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.ErrorContent
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.LoadingContent
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.PaginationErrorItem
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.VehicleCard
+import com.fakhry.transjakarta.feature.vehicles.presentation.model.RateLimitUiState
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleUiModel
 
 @Suppress("ParamsComparedByRef")
@@ -44,9 +45,10 @@ import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleUiMode
 fun VehicleListScreen(
     modifier: Modifier = Modifier,
     onVehicleClick: (String) -> Unit,
-    viewModel: VehicleListViewModel =  hiltViewModel(),
+    viewModel: VehicleListViewModel = hiltViewModel(),
 ) {
     val lazyPagingItems = viewModel.vehiclesPagingFlow.collectAsLazyPagingItems()
+    val rateLimitState by viewModel.rateLimitState.collectAsState()
 
     Scaffold(
         modifier = modifier,
@@ -63,6 +65,8 @@ fun VehicleListScreen(
         VehicleListContent(
             lazyPagingItems = lazyPagingItems,
             onVehicleClick = onVehicleClick,
+            rateLimitState = rateLimitState,
+            onRateLimitDetected = viewModel::onRateLimitDetected,
             modifier = Modifier.padding(paddingValues),
         )
     }
@@ -73,13 +77,22 @@ fun VehicleListScreen(
 private fun VehicleListContent(
     lazyPagingItems: LazyPagingItems<VehicleUiModel>,
     onVehicleClick: (String) -> Unit,
+    rateLimitState: RateLimitUiState?,
+    onRateLimitDetected: (RateLimitException) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val refreshState = lazyPagingItems.loadState.refresh
+    val refreshError = (refreshState as? LoadState.Error)?.error
+    val refreshRateLimit = refreshError as? RateLimitException
+    val refreshRateLimitState = if (refreshRateLimit != null) rateLimitState else null
     var isRefreshing by remember { mutableStateOf(false) }
 
     // Update isRefreshing based on load state
     isRefreshing = refreshState is LoadState.Loading
+
+    LaunchedEffect(refreshRateLimit) {
+        refreshRateLimit?.let(onRateLimitDetected)
+    }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -94,7 +107,8 @@ private fun VehicleListContent(
             // Initial error
             refreshState is LoadState.Error && lazyPagingItems.itemCount == 0 -> {
                 ErrorContent(
-                    message = refreshState.error.localizedMessage ?: "An error occurred",
+                    message = "An error occurred",
+                    rateLimitState = refreshRateLimitState,
                     onRetry = { lazyPagingItems.retry() },
                 )
             }
@@ -140,8 +154,15 @@ private fun VehicleListContent(
                     if (lazyPagingItems.loadState.append is LoadState.Error) {
                         item {
                             val error = (lazyPagingItems.loadState.append as LoadState.Error).error
+                            val appendRateLimit = error as? RateLimitException
+                            val appendRateLimitState =
+                                if (appendRateLimit != null) rateLimitState else null
+                            LaunchedEffect(appendRateLimit) {
+                                appendRateLimit?.let(onRateLimitDetected)
+                            }
                             PaginationErrorItem(
-                                message = error.localizedMessage ?: "Failed to load more",
+                                message = "Failed to load more",
+                                rateLimitState = appendRateLimitState,
                                 onRetry = { lazyPagingItems.retry() },
                             )
                         }
@@ -152,132 +173,9 @@ private fun VehicleListContent(
     }
 }
 
-@Composable
-private fun LoadingContent(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            CircularProgressIndicator()
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Loading vehicles...",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+internal fun retryButtonLabel(rateLimitState: RateLimitUiState?): String =
+    if (rateLimitState?.retryEnabled == false) {
+        "Retry in ${rateLimitState.countdownLabel}"
+    } else {
+        "Retry"
     }
-}
-
-@Composable
-private fun ErrorContent(message: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp),
-        ) {
-            Text(
-                text = "⚠️",
-                style = MaterialTheme.typography.displayMedium,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Something went wrong",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.error,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = onRetry) {
-                Text("Retry")
-            }
-        }
-    }
-}
-
-@Composable
-private fun EmptyContent(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp),
-        ) {
-            Text(
-                text = "🚌",
-                style = MaterialTheme.typography.displayLarge,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "No vehicles found",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun PaginationErrorItem(
-    message: String,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.error,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = onRetry) {
-            Text("Retry")
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoadingContentPreview() {
-    TransjakartaTheme {
-        LoadingContent()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ErrorContentPreview() {
-    TransjakartaTheme {
-        ErrorContent(
-            message = "Network error: Unable to connect",
-            onRetry = {},
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun EmptyContentPreview() {
-    TransjakartaTheme {
-        EmptyContent()
-    }
-}
