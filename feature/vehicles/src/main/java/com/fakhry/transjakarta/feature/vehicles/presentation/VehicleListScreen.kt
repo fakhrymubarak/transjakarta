@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -37,11 +39,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.fakhry.transjakarta.feature.vehicles.domain.error.RateLimitException
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.EmptyContent
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.ErrorContent
-import com.fakhry.transjakarta.feature.vehicles.presentation.components.LoadingContent
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.PaginationErrorItem
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.RouteFilterSheet
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.TripFilterSheet
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.VehicleCard
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.VehicleCardPlaceholder
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.RateLimitUiState
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleUiModel
 
@@ -161,7 +163,16 @@ private fun VehicleListContent(
         when {
             // Initial loading
             refreshState is LoadState.Loading && lazyPagingItems.itemCount == 0 -> {
-                LoadingContent()
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    userScrollEnabled = false,
+                ) {
+                    items(6) {
+                        VehicleCardPlaceholder()
+                    }
+                }
             }
             // Initial error
             refreshState is LoadState.Error && lazyPagingItems.itemCount == 0 -> {
@@ -234,18 +245,25 @@ private fun VehicleListContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FilterEntryButton(label: String, count: Int, onClick: () -> Unit) {
-    val buttonLabel = if (count > 0) "$label ($count)" else label
-    if (count > 0) {
-        FilledTonalButton(onClick = onClick) {
-            Text(text = buttonLabel)
-        }
-    } else {
-        OutlinedButton(onClick = onClick) {
-            Text(text = buttonLabel)
-        }
-    }
+    FilterChip(
+        selected = count > 0,
+        onClick = onClick,
+        label = { Text(if (count > 0) "$label ($count)" else label) },
+        leadingIcon = if (count > 0) {
+            {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        } else {
+            null
+        },
+    )
 }
 
 internal fun retryButtonLabel(rateLimitState: RateLimitUiState?): String =

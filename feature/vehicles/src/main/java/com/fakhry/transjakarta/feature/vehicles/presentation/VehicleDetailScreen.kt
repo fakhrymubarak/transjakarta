@@ -26,9 +26,8 @@ import androidx.compose.material.icons.filled.Signpost
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
@@ -42,6 +41,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fakhry.transjakarta.core.designsystem.state.UiState
+import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.VehicleDetailPlaceholder
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleDetailUiModel
 
 @Composable
@@ -60,9 +61,7 @@ fun VehicleDetailScreen(
 
 @Composable
 private fun LoadingState(modifier: Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
+    VehicleDetailPlaceholder(modifier)
 }
 
 @Composable
@@ -172,14 +171,7 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
                 SuggestionChip(
                     onClick = { },
                     label = { Text(vehicle.statusLabel) },
-                    icon = {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary),
-                        )
-                    },
+                    icon = { StatusIndicator(vehicle.currentStatus) },
                 )
             }
 
@@ -234,10 +226,13 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
         )
 
         // Map Placeholder
-        Card(
+        ElevatedCard(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         ) {
             Box(
                 modifier = Modifier
@@ -272,10 +267,11 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
 
 @Composable
 private fun InfoCard(title: String, icon: ImageVector, content: @Composable () -> Unit) {
-    Card(
+    ElevatedCard(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -298,4 +294,21 @@ private fun InfoCard(title: String, icon: ImageVector, content: @Composable () -
             content()
         }
     }
+}
+
+@Composable
+private fun StatusIndicator(status: VehicleStatus, modifier: Modifier = Modifier) {
+    val color = when (status) {
+        VehicleStatus.STOPPED_AT -> MaterialTheme.colorScheme.error
+        VehicleStatus.IN_TRANSIT_TO -> MaterialTheme.colorScheme.primary
+        VehicleStatus.INCOMING_AT -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.outline
+    }
+
+    Box(
+        modifier = modifier
+            .size(8.dp)
+            .clip(CircleShape)
+            .background(color),
+    )
 }
