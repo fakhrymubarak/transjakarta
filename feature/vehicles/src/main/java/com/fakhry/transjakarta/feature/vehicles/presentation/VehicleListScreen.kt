@@ -2,6 +2,7 @@ package com.fakhry.transjakarta.feature.vehicles.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -69,9 +70,11 @@ fun VehicleListScreen(
         viewModel.applyFilters(appliedFilters)
     }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             TopAppBar(
                 title = { Text("Vehicles") },
                 actions = {
@@ -92,8 +95,16 @@ fun VehicleListScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ),
             )
-        },
-    ) { paddingValues ->
+
+            VehicleListContent(
+                lazyPagingItems = lazyPagingItems,
+                onVehicleClick = onVehicleClick,
+                rateLimitState = rateLimitState,
+                onRateLimitDetected = viewModel::onRateLimitDetected,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
         if (showRouteFilters) {
             RouteFilterSheet(
                 state = filterState,
@@ -123,13 +134,6 @@ fun VehicleListScreen(
                 onTripToggle = filterViewModel::toggleTripSelection,
             )
         }
-        VehicleListContent(
-            lazyPagingItems = lazyPagingItems,
-            onVehicleClick = onVehicleClick,
-            rateLimitState = rateLimitState,
-            onRateLimitDetected = viewModel::onRateLimitDetected,
-            modifier = Modifier.padding(paddingValues),
-        )
     }
 }
 
@@ -267,7 +271,7 @@ private fun FilterEntryButton(label: String, count: Int, onClick: () -> Unit) {
 }
 
 internal fun retryButtonLabel(rateLimitState: RateLimitUiState?): String =
-    if (rateLimitState?.retryEnabled == false) {
+    if (rateLimitState != null && !rateLimitState.retryEnabled) {
         "Retry in ${rateLimitState.countdownLabel}"
     } else {
         "Retry"

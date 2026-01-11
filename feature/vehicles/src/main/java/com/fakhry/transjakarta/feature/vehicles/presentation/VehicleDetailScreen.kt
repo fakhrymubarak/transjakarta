@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Signpost
 import androidx.compose.material.icons.filled.Timeline
@@ -33,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,15 +42,8 @@ import androidx.compose.ui.unit.dp
 import com.fakhry.transjakarta.core.designsystem.state.UiState
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.VehicleDetailPlaceholder
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.VehicleMapCard
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleDetailUiModel
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun VehicleDetailScreen(
@@ -61,16 +52,11 @@ fun VehicleDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     when (uiState) {
-        is UiState.Loading -> LoadingState(modifier)
+        is UiState.Loading -> VehicleDetailPlaceholder(modifier)
         is UiState.Empty -> EmptyState(modifier, onRetry)
         is UiState.Error -> ErrorState(modifier, uiState.message, uiState.isNetworkError, onRetry)
         is UiState.Success -> SuccessState(modifier, uiState.data)
     }
-}
-
-@Composable
-private fun LoadingState(modifier: Modifier) {
-    VehicleDetailPlaceholder(modifier)
 }
 
 @Composable
@@ -160,6 +146,7 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        Spacer(modifier = Modifier.height(24.dp))
         // Header Section
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -234,44 +221,12 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
             },
         )
 
-        // Map Placeholder
-        ElevatedCard(
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
-            colors = CardDefaults.elevatedCardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-            ) {
-                val vehicleLocation = LatLng(vehicle.latitude, vehicle.longitude)
-                val cameraPositionState = rememberCameraPositionState {
-                    position = CameraPosition.fromLatLngZoom(vehicleLocation, 15f)
-                }
-
-                LaunchedEffect(vehicleLocation) {
-                    cameraPositionState.animate(
-                        update = CameraUpdateFactory.newLatLng(vehicleLocation),
-                        durationMs = 1000
-                    )
-                }
-
-                GoogleMap(
-                    modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState,
-                    uiSettings = MapUiSettings(zoomControlsEnabled = false),
-                ) {
-                    Marker(
-                        state = MarkerState(position = vehicleLocation),
-                        title = vehicle.label,
-                    )
-                }
-            }
-        }
+        // Map Section
+        VehicleMapCard(
+            latitude = vehicle.latitude,
+            longitude = vehicle.longitude,
+            label = vehicle.label,
+        )
     }
 }
 
