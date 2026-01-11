@@ -1,0 +1,89 @@
+package com.fakhry.transjakarta.feature.vehicles.data.repository
+
+import androidx.paging.testing.asSnapshot
+import com.fakhry.transjakarta.feature.vehicles.data.paging.TripPagingSource
+import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripAttributesDto
+import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripDataDto
+import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripsResponse
+import com.fakhry.transjakarta.feature.vehicles.data.remote.service.TripMbtaApiService
+import com.fakhry.transjakarta.feature.vehicles.domain.model.TripFilters
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class TripRepositoryImplTest {
+    private val testDispatcher = StandardTestDispatcher()
+
+    @Test
+    fun `empty filters returns empty paging data and does not call api`() =
+        runTest(testDispatcher) {
+            val api = RecordingTripService()
+            val repository = TripRepositoryImpl(api)
+
+            val items = repository.getTripsPagingFlow(TripFilters()).asSnapshot()
+
+            assertTrue(items.isEmpty())
+            assertTrue(api.calls.isEmpty())
+        }
+
+    @Test
+    fun `non-empty filters calls api and returns trips`() = runTest(testDispatcher) {
+        val api = RecordingTripService(
+            response = TripsResponse(
+                data = listOf(
+                    TripDataDto(
+                        id = "trip-1",
+                        attributes = TripAttributesDto(
+                            name = "Trip 1",
+                            headsign = "Headsign 1",
+                            blockId = "block-1",
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val repository = TripRepositoryImpl(api)
+
+        val filters = TripFilters(routeIds = setOf("route-1"))
+        val items = repository.getTripsPagingFlow(filters).asSnapshot()
+
+        assertEquals(1, items.size)
+        val trip = items.first()
+        assertEquals("trip-1", trip.id)
+        assertEquals("Trip 1", trip.name)
+        assertEquals("Headsign 1", trip.headsign)
+        assertEquals("block-1", trip.blockId)
+
+        val call = api.calls.single()
+        assertEquals(mapOf("filter[route]" to "route-1"), call.filters)
+        assertEquals(0, call.offset)
+        assertEquals(TripPagingSource.PAGE_SIZE, call.limit)
+    }
+
+    private class RecordingTripService(
+        private val response: TripsResponse = TripsResponse(emptyList()),
+    ) : TripMbtaApiService {
+        data class Call(
+            val filters: Map<String, String>,
+            val offset: Int,
+            val limit: Int,
+            val fields: String,
+        )
+
+        val calls = mutableListOf<Call>()
+
+        override suspend fun getTrips(
+            filters: Map<String, String>,
+            offset: Int,
+            limit: Int,
+            fields: String,
+        ): TripsResponse {
+            calls += Call(filters, offset, limit, fields)
+            return response
+        }
+    }
+}

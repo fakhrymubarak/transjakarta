@@ -6,37 +6,49 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.fakhry.transjakarta.feature.vehicles.domain.error.RateLimitException
+import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleFilters
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.VehicleRepository
 import com.fakhry.transjakarta.feature.vehicles.presentation.mapper.toUiModel
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.RateLimitUiState
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class VehicleListViewModel @Inject constructor(
     repository: VehicleRepository,
 ) : ViewModel() {
+    private val appliedFilters = MutableStateFlow(VehicleFilters())
+
     val vehiclesPagingFlow: Flow<PagingData<VehicleUiModel>> =
-        repository
-            .getVehiclesPagingFlow()
-            .map { pagingData -> pagingData.map { it.toUiModel() } }
-            .cachedIn(viewModelScope)
+        appliedFilters
+            .flatMapLatest { filters ->
+                repository.getVehiclesPagingFlow(filters)
+            }.map { pagingData ->
+                pagingData.map { it.toUiModel() }
+            }.cachedIn(viewModelScope)
 
     private val _rateLimitState = MutableStateFlow<RateLimitUiState?>(null)
     val rateLimitState: StateFlow<RateLimitUiState?> = _rateLimitState.asStateFlow()
     private var rateLimitJob: Job? = null
     private var activeResetAt: Long? = null
     internal var epochSecondsProvider: () -> Long = { System.currentTimeMillis() / 1_000 }
+
+    fun applyFilters(filters: VehicleFilters) {
+        appliedFilters.value = filters
+    }
 
     fun onRateLimitDetected(error: RateLimitException) {
         val resetAt = error.resetAtEpochSeconds

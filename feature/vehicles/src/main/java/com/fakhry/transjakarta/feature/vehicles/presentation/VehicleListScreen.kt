@@ -3,14 +3,18 @@ package com.fakhry.transjakarta.feature.vehicles.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,6 +39,8 @@ import com.fakhry.transjakarta.feature.vehicles.presentation.components.EmptyCon
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.ErrorContent
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.LoadingContent
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.PaginationErrorItem
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.RouteFilterSheet
+import com.fakhry.transjakarta.feature.vehicles.presentation.components.TripFilterSheet
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.VehicleCard
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.RateLimitUiState
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleUiModel
@@ -46,15 +52,39 @@ fun VehicleListScreen(
     modifier: Modifier = Modifier,
     onVehicleClick: (String) -> Unit,
     viewModel: VehicleListViewModel = hiltViewModel(),
+    filterViewModel: FilterViewModel = hiltViewModel(),
 ) {
     val lazyPagingItems = viewModel.vehiclesPagingFlow.collectAsLazyPagingItems()
     val rateLimitState by viewModel.rateLimitState.collectAsState()
+    val filterState by filterViewModel.uiState.collectAsState()
+    val appliedFilters by filterViewModel.appliedFilters.collectAsState()
+    val routeFilterCount = appliedFilters.routeIds.size
+    val tripFilterCount = appliedFilters.tripIds.size
+    var showRouteFilters by remember { mutableStateOf(false) }
+    var showTripFilters by remember { mutableStateOf(false) }
+
+    LaunchedEffect(appliedFilters) {
+        viewModel.applyFilters(appliedFilters)
+    }
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text("Vehicles") },
+                actions = {
+                    FilterEntryButton(
+                        label = "Routes",
+                        count = routeFilterCount,
+                        onClick = { showRouteFilters = true },
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    FilterEntryButton(
+                        label = "Trips",
+                        count = tripFilterCount,
+                        onClick = { showTripFilters = true },
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -62,6 +92,35 @@ fun VehicleListScreen(
             )
         },
     ) { paddingValues ->
+        if (showRouteFilters) {
+            RouteFilterSheet(
+                state = filterState,
+                onDismissRequest = { showRouteFilters = false },
+                onApply = {
+                    filterViewModel.applyFilters()
+                    showRouteFilters = false
+                },
+                onClear = { filterViewModel.clearRoutes() },
+                onRetryRoutes = { filterViewModel.retryRoutes() },
+                onRouteSearchChange = filterViewModel::updateRouteSearchQuery,
+                onRouteToggle = filterViewModel::toggleRouteSelection,
+            )
+        }
+        if (showTripFilters) {
+            val tripItems = filterViewModel.tripsPagingFlow.collectAsLazyPagingItems()
+            TripFilterSheet(
+                state = filterState,
+                trips = tripItems,
+                onDismissRequest = { showTripFilters = false },
+                onApply = {
+                    filterViewModel.applyFilters()
+                    showTripFilters = false
+                },
+                onClear = { filterViewModel.clearTrips() },
+                onTripSearchChange = filterViewModel::updateTripSearchQuery,
+                onTripToggle = filterViewModel::toggleTripSelection,
+            )
+        }
         VehicleListContent(
             lazyPagingItems = lazyPagingItems,
             onVehicleClick = onVehicleClick,
@@ -169,6 +228,20 @@ private fun VehicleListContent(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FilterEntryButton(label: String, count: Int, onClick: () -> Unit) {
+    val buttonLabel = if (count > 0) "$label ($count)" else label
+    if (count > 0) {
+        FilledTonalButton(onClick = onClick) {
+            Text(text = buttonLabel)
+        }
+    } else {
+        OutlinedButton(onClick = onClick) {
+            Text(text = buttonLabel)
         }
     }
 }

@@ -11,6 +11,7 @@ private val libs: VersionCatalog = extensions.getByType<VersionCatalogsExtension
 
 dependencies {
     implementation(project(":core:networking"))
+    implementation(project(":core:domain"))
     implementation(project(":core:designsystem"))
 
     catalogDeps(libs) {
@@ -28,6 +29,9 @@ dependencies {
             LibraryAliases.ANDROIDX_LIFECYCLE_VIEWMODEL_COMPOSE,
             LibraryAliases.HILT_ANDROID,
             LibraryAliases.HILT_NAVIGATION_COMPOSE,
+
+            // Collection Immutable
+            LibraryAliases.KOTLINX_COLLECTIONS_IMMUTABLE
         )
         debugImplementation(LibraryAliases.COMPOSE_UI_TOOLING)
     }

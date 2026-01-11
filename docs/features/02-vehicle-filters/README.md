@@ -33,9 +33,9 @@ Enable multi-select filtering by route and trip so users can narrow the vehicle 
 - Local: selected filter IDs stored in ViewModel (in-memory only).
 
 ## Architecture
-- Presentation: MVVM screen using Compose filter sheet with multi-select chips or checkboxes.
+- Presentation: MVVM screen using Compose filter sheet with multi-select chips or checkboxes (ADR 01, 02).
 - Domain: `FetchRoutes`, `FetchTrips`, and `ApplyVehicleFilters` use cases.
-- Data: `RouteRepository`, `TripRepository`, and `VehicleRepository` using Retrofit + OkHttp and Kotlinx Serialization.
+- Data: `RouteRepository`, `TripRepository`, and `VehicleRepository` using Retrofit + OkHttp and Kotlinx Serialization (ADR 03, 04).
 
 ## Dependencies
 - Retrofit + OkHttp for REST calls.
@@ -64,9 +64,11 @@ Enable multi-select filtering by route and trip so users can narrow the vehicle 
 - `filters_cleared`
 
 ## Testing plan
-- Unit: build query params for `filter[route]` and `filter[trip]`.
-- UI: multi-select UI selection and clear.
-- Integration: filtered `GET /vehicles` results.
+- Approach: TDD for filter logic and viewmodel state; write failing tests first.
+- Unit: parameterized JUnit 5 tests for query param building (route-only, trip-only, both, none).
+- Unit: `FilterViewModel` selection state, apply/clear flows, and error propagation.
+- UI: multi-select selection, applied state indicators, and clear/reset.
+- Integration: filtered `GET /vehicles` results with `filter[route]` and `filter[trip]`.
 
 ## Rollout/flags
 - None.

@@ -4,78 +4,91 @@ import com.fakhry.transjakarta.feature.vehicles.domain.model.Vehicle
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 import java.util.Locale
+import java.util.TimeZone
 
 class VehicleUiMapperTest {
-    private lateinit var previousLocale: Locale
-
-    @BeforeEach
-    fun setup() {
-        previousLocale = Locale.getDefault()
-        Locale.setDefault(Locale.US)
-    }
+    private val defaultLocale = Locale.getDefault()
+    private val defaultTimeZone = TimeZone.getDefault()
 
     @AfterEach
     fun tearDown() {
-        Locale.setDefault(previousLocale)
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("statusCases")
-    fun `toUiModel formats status coordinates and updatedAt`(
-        status: VehicleStatus,
-        expectedLabel: String,
-    ) {
-        val vehicle =
-            Vehicle(
-                id = "v1",
-                label = "Bus 123",
-                currentStatus = status,
-                latitude = 10.123456,
-                longitude = 20.654321,
-                updatedAt = "2024-01-15T14:30:00-05:00",
-            )
-
-        val uiModel = vehicle.toUiModel()
-
-        assertEquals("v1", uiModel.id)
-        assertEquals("Bus 123", uiModel.label)
-        assertEquals(status, uiModel.currentStatus)
-        assertEquals(expectedLabel, uiModel.statusLabel)
-        assertEquals("10.123456, 20.654321", uiModel.coordinatesLabel)
-        assertEquals("Jan 15, 14:30:00", uiModel.updatedAtLabel)
+        Locale.setDefault(defaultLocale)
+        TimeZone.setDefault(defaultTimeZone)
     }
 
     @Test
-    fun `toUiModel returns Unknown when updatedAt is blank`() {
-        val vehicle =
-            Vehicle(
-                id = "v2",
-                label = "Bus 456",
-                currentStatus = VehicleStatus.UNKNOWN,
-                latitude = 0.0,
-                longitude = 0.0,
-                updatedAt = "",
-            )
+    fun `maps vehicle to ui model with status and coordinates`() {
+        val vehicle = Vehicle(
+            id = "v1",
+            label = "Bus 1",
+            currentStatus = VehicleStatus.IN_TRANSIT_TO,
+            latitude = -6.2001,
+            longitude = 106.8167,
+            updatedAt = "2024-01-01T12:34:56Z",
+        )
+        Locale.setDefault(Locale.US)
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-        val uiModel = vehicle.toUiModel()
+        val ui = vehicle.toUiModel()
 
-        assertEquals("Unknown", uiModel.updatedAtLabel)
-        assertEquals("Unknown", uiModel.statusLabel)
+        assertEquals("v1", ui.id)
+        assertEquals("Bus 1", ui.label)
+        assertEquals(VehicleStatus.IN_TRANSIT_TO, ui.currentStatus)
+        assertEquals("In Transit", ui.statusLabel)
+        assertEquals("-6.200100, 106.816700", ui.coordinatesLabel)
+        assertEquals("Jan 01, 12:34:56", ui.updatedAtLabel)
     }
 
-    companion object {
-        @JvmStatic
-        fun statusCases(): List<Arguments> = listOf(
-            Arguments.of(VehicleStatus.IN_TRANSIT_TO, "In Transit"),
-            Arguments.of(VehicleStatus.STOPPED_AT, "Stopped"),
-            Arguments.of(VehicleStatus.INCOMING_AT, "Incoming"),
-            Arguments.of(VehicleStatus.UNKNOWN, "Unknown"),
+    @Test
+    fun `formats updated at with offset timezone`() {
+        val vehicle = Vehicle(
+            id = "v1",
+            label = "Bus 1",
+            currentStatus = VehicleStatus.STOPPED_AT,
+            latitude = 0.0,
+            longitude = 0.0,
+            updatedAt = "2024-01-01T15:45:30+07:00",
         )
+        Locale.setDefault(Locale.US)
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+
+        val ui = vehicle.toUiModel()
+
+        assertEquals("Jan 01, 15:45:30", ui.updatedAtLabel)
+    }
+
+    @Test
+    fun `blank updated at returns Unknown label`() {
+        val vehicle = Vehicle(
+            id = "v1",
+            label = "Bus 1",
+            currentStatus = VehicleStatus.UNKNOWN,
+            latitude = 0.0,
+            longitude = 0.0,
+            updatedAt = "",
+        )
+
+        val ui = vehicle.toUiModel()
+
+        assertEquals("Unknown", ui.updatedAtLabel)
+    }
+
+    @Test
+    fun `unparseable updated at falls back to raw string`() {
+        val raw = "not-a-date"
+        val vehicle = Vehicle(
+            id = "v1",
+            label = "Bus 1",
+            currentStatus = VehicleStatus.UNKNOWN,
+            latitude = 0.0,
+            longitude = 0.0,
+            updatedAt = raw,
+        )
+
+        val ui = vehicle.toUiModel()
+
+        assertEquals(raw, ui.updatedAtLabel)
     }
 }

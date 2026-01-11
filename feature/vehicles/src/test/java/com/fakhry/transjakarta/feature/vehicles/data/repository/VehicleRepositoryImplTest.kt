@@ -6,6 +6,7 @@ import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleData
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehiclesResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.VehicleMbtaApiService
+import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleFilters
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -17,18 +18,31 @@ class VehicleRepositoryImplTest {
         val fakeApi = RecordingVehicleMbtaApiService(response)
         val repository = VehicleRepositoryImpl(fakeApi)
 
-        val snapshot = repository.getVehiclesPagingFlow().asSnapshot()
+        val snapshot = repository.getVehiclesPagingFlow(
+            VehicleFilters(
+                routeIds = setOf("route-1"),
+                tripIds = setOf("trip-1"),
+            ),
+        ).asSnapshot()
 
         assertEquals(20, snapshot.size)
         assertEquals("v1", snapshot.first().id)
         assertEquals(
             listOf(
                 VehicleRequest(
+                    filters = mapOf(
+                        "filter[route]" to "route-1",
+                        "filter[trip]" to "trip-1",
+                    ),
                     offset = 0,
                     limit = 10,
                     fields = "label,current_status,latitude,longitude,updated_at",
                 ),
                 VehicleRequest(
+                    filters = mapOf(
+                        "filter[route]" to "route-1",
+                        "filter[trip]" to "trip-1",
+                    ),
                     offset = 10,
                     limit = 10,
                     fields = "label,current_status,latitude,longitude,updated_at",
@@ -40,6 +54,7 @@ class VehicleRepositoryImplTest {
 }
 
 private data class VehicleRequest(
+    val filters: Map<String, String>,
     val offset: Int,
     val limit: Int,
     val fields: String,
@@ -50,9 +65,15 @@ private class RecordingVehicleMbtaApiService(
 ) : VehicleMbtaApiService {
     val requests = mutableListOf<VehicleRequest>()
 
-    override suspend fun getVehicles(offset: Int, limit: Int, fields: String): VehiclesResponse {
+    override suspend fun getVehicles(
+        filters: Map<String, String>,
+        offset: Int,
+        limit: Int,
+        fields: String,
+    ): VehiclesResponse {
         requests.add(
             VehicleRequest(
+                filters = filters,
                 offset = offset,
                 limit = limit,
                 fields = fields,
@@ -61,7 +82,7 @@ private class RecordingVehicleMbtaApiService(
         return response
     }
 
-    override suspend fun getVehicle(id: String): VehicleResponse {
+    override suspend fun getVehicle(id: String, include: String, fields: String): VehicleResponse {
         error("Not used in VehicleRepositoryImplTest")
     }
 }

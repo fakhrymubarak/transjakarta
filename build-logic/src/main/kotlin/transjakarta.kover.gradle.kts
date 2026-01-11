@@ -13,6 +13,7 @@ kover {
                     "**/Manifest*",
                     "*Screen",
                     "*ScreenKt",
+                    "*ApiService",
                     "*_*Factory*",
                     "*_Factory*",
                     "Hilt_*",

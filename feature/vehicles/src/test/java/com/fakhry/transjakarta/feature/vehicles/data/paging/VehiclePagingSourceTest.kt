@@ -9,6 +9,7 @@ import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleResp
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehiclesResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.VehicleMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Vehicle
+import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleFilters
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -32,7 +33,7 @@ class VehiclePagingSourceTest {
         val vehicles = createTestVehicles(10)
         fakeApiService.setResponse(VehiclesResponse(data = vehicles))
 
-        val pagingSource = VehiclePagingSource(fakeApiService)
+        val pagingSource = VehiclePagingSource(fakeApiService, VehicleFilters())
 
         // When
         val result = pagingSource.load(
@@ -57,7 +58,7 @@ class VehiclePagingSourceTest {
         val vehicles = createTestVehicles(5)
         fakeApiService.setResponse(VehiclesResponse(data = vehicles))
 
-        val pagingSource = VehiclePagingSource(fakeApiService)
+        val pagingSource = VehiclePagingSource(fakeApiService, VehicleFilters())
 
         // When
         val result = pagingSource.load(
@@ -80,7 +81,7 @@ class VehiclePagingSourceTest {
         // Given
         fakeApiService.setError(IOException("Network error"))
 
-        val pagingSource = VehiclePagingSource(fakeApiService)
+        val pagingSource = VehiclePagingSource(fakeApiService, VehicleFilters())
 
         // When
         val result = pagingSource.load(
@@ -103,7 +104,7 @@ class VehiclePagingSourceTest {
         val vehicles = createTestVehicles(10)
         fakeApiService.setResponse(VehiclesResponse(data = vehicles))
 
-        val pagingSource = VehiclePagingSource(fakeApiService)
+        val pagingSource = VehiclePagingSource(fakeApiService, VehicleFilters())
 
         // When - loading page 2 (offset 10)
         val result = pagingSource.load(
@@ -139,7 +140,7 @@ class VehiclePagingSourceTest {
         )
         fakeApiService.setResponse(VehiclesResponse(data = vehicles))
 
-        val pagingSource = VehiclePagingSource(fakeApiService)
+        val pagingSource = VehiclePagingSource(fakeApiService, VehicleFilters())
 
         // When
         val result = pagingSource.load(
@@ -163,8 +164,35 @@ class VehiclePagingSourceTest {
     }
 
     @Test
+    fun `load passes filters to api`() = runTest {
+        val vehicles = createTestVehicles(1)
+        fakeApiService.setResponse(VehiclesResponse(data = vehicles))
+        val filters = VehicleFilters(
+            routeIds = setOf("route-2", "route-1"),
+            tripIds = setOf("trip-1"),
+        )
+        val pagingSource = VehiclePagingSource(fakeApiService, filters)
+
+        pagingSource.load(
+            PagingSource.LoadParams.Refresh(
+                key = null,
+                loadSize = 10,
+                placeholdersEnabled = false,
+            ),
+        )
+
+        assertEquals(
+            mapOf(
+                "filter[route]" to "route-1,route-2",
+                "filter[trip]" to "trip-1",
+            ),
+            fakeApiService.lastFilters,
+        )
+    }
+
+    @Test
     fun `getRefreshKey returns closest offset from anchor position`() {
-        val pagingSource = VehiclePagingSource(fakeApiService)
+        val pagingSource = VehiclePagingSource(fakeApiService, VehicleFilters())
         val pageSize = VehiclePagingSource.PAGE_SIZE
         val page1 =
             PagingSource.LoadResult.Page(
@@ -222,6 +250,7 @@ class VehiclePagingSourceTest {
 private class FakeVehicleMbtaApiService : VehicleMbtaApiService {
     private var response: VehiclesResponse? = null
     private var error: Throwable? = null
+    var lastFilters: Map<String, String>? = null
 
     fun setResponse(response: VehiclesResponse) {
         this.response = response
@@ -233,13 +262,17 @@ private class FakeVehicleMbtaApiService : VehicleMbtaApiService {
         this.response = null
     }
 
-    override suspend fun getVehicles(offset: Int, limit: Int, fields: String): VehiclesResponse {
+    override suspend fun getVehicles(
+        filters: Map<String, String>,
+        offset: Int,
+        limit: Int,
+        fields: String,
+    ): VehiclesResponse {
+        lastFilters = filters
         error?.let { throw it }
         return response ?: throw IllegalStateException("No response configured")
     }
 
-    override suspend fun getVehicle(id: String): VehicleResponse {
-        // Not used in VehiclePagingSourceTest
-        TODO("Not yet implemented")
-    }
+    override suspend fun getVehicle(id: String, include: String, fields: String): VehicleResponse =
+        error("Not used")
 }

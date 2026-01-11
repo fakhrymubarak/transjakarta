@@ -8,12 +8,13 @@ import androidx.paging.PagingState
 import androidx.paging.testing.asSnapshot
 import com.fakhry.transjakarta.feature.vehicles.domain.error.RateLimitException
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Vehicle
+import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleFilters
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.VehicleRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -113,7 +114,7 @@ class VehicleListViewModelTest {
 private class FakeVehicleRepository(
     private val vehicles: List<Vehicle>,
 ) : VehicleRepository {
-    override fun getVehiclesPagingFlow(): Flow<PagingData<Vehicle>> = Pager(
+    override fun getVehiclesPagingFlow(filters: VehicleFilters): Flow<PagingData<Vehicle>> = Pager(
         config = PagingConfig(
             pageSize = vehicles.size,
             initialLoadSize = vehicles.size,
@@ -121,6 +122,8 @@ private class FakeVehicleRepository(
         ),
         pagingSourceFactory = { FakePagingSource(vehicles) },
     ).flow
+
+    override suspend fun getVehicleDetail(id: String) = error("not used")
 }
 
 private class FakePagingSource(

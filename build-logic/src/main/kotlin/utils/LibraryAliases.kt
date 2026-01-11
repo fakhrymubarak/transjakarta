@@ -13,4 +13,5 @@ object LibraryAliases {
     const val HILT_NAVIGATION_COMPOSE = "hilt-navigation-compose"
     const val JUNIT_JUPITER_ENGINE = "junit-jupiter-engine"
     const val JUNIT_PLATFORM_LAUNCHER = "junit-platform-launcher"
+    const val KOTLINX_COLLECTIONS_IMMUTABLE = "kotlinx-collections-immutable"
 }
