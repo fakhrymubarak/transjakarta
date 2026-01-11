@@ -6,9 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fakhry.transjakarta.core.designsystem.state.UiState
 import com.fakhry.transjakarta.core.domain.DomainResult
-import com.fakhry.transjakarta.feature.vehicles.domain.usecase.GetVehicleDetailWithRelationsUseCase
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleDetailWithRelations
-import com.fakhry.transjakarta.feature.vehicles.domain.repository.VehicleRepository
+import com.fakhry.transjakarta.feature.vehicles.domain.usecase.GetVehicleDetailWithRelationsUseCase
 import com.fakhry.transjakarta.feature.vehicles.presentation.mapper.toUiModel
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleDetailUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +24,6 @@ import javax.inject.Inject
 class VehicleDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getVehicleDetailWithRelations: GetVehicleDetailWithRelationsUseCase,
-    private val vehicleRepository: VehicleRepository,
 ) : ViewModel() {
     private val vehicleId: String = checkNotNull(savedStateHandle["vehicleId"])
 
@@ -74,13 +72,10 @@ class VehicleDetailViewModel @Inject constructor(
         pollJob = viewModelScope.launch {
             while (isActive) {
                 delay(POLLING_INTERVAL_MS)
-                when (val result = vehicleRepository.getVehicleDetail(vehicleId)) {
+                when (val result = getVehicleDetailWithRelations(vehicleId)) {
                     is DomainResult.Success -> {
-                        val newVehicle = result.data
-                        currentDetail = currentDetail?.copy(vehicle = newVehicle)
-                        currentDetail?.let {
-                            _uiState.value = UiState.Success(it.toUiModel())
-                        }
+                        currentDetail = result.data
+                        _uiState.value = UiState.Success(result.data.toUiModel())
                     }
                     else -> Unit // Ignore errors during polling.
                 }

@@ -18,6 +18,7 @@ data class TripDataDto(
     val id: String,
     val type: String? = null,
     val attributes: TripAttributesDto? = null,
+    val relationships: TripRelationshipsDto? = null,
 )
 
 @Serializable

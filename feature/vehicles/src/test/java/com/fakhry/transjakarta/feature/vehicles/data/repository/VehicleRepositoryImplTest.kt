@@ -59,7 +59,7 @@ class VehicleRepositoryImplTest {
         val vehicleDto = createTestVehicles(1).first()
         val response = VehicleResponse(data = vehicleDto)
         val fakeApi = RecordingVehicleMbtaApiService(
-            response = VehiclesResponse(emptyList())
+            response = VehiclesResponse(emptyList()),
         )
         fakeApi.singleResponse = response
 
@@ -102,9 +102,8 @@ private class RecordingVehicleMbtaApiService(
         return response
     }
 
-    override suspend fun getVehicle(id: String, include: String, fields: String): VehicleResponse {
-        return singleResponse ?: error("Not set")
-    }
+    override suspend fun getVehicle(id: String, include: String, fields: String): VehicleResponse =
+        singleResponse ?: error("Not set")
 }
 
 private fun createTestVehicles(count: Int): List<VehicleDataDto> = (1..count).map { i ->

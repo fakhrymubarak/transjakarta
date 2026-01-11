@@ -1,14 +1,17 @@
 package com.fakhry.transjakarta.feature.vehicles.di
 
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.RouteMbtaApiService
+import com.fakhry.transjakarta.feature.vehicles.data.remote.service.ShapeMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.StopMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.TripMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.VehicleMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.data.repository.RouteRepositoryImpl
+import com.fakhry.transjakarta.feature.vehicles.data.repository.ShapeRepositoryImpl
 import com.fakhry.transjakarta.feature.vehicles.data.repository.StopRepositoryImpl
 import com.fakhry.transjakarta.feature.vehicles.data.repository.TripRepositoryImpl
 import com.fakhry.transjakarta.feature.vehicles.data.repository.VehicleRepositoryImpl
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.RouteRepository
+import com.fakhry.transjakarta.feature.vehicles.domain.repository.ShapeRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.StopRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.TripRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.VehicleRepository
@@ -36,6 +39,9 @@ abstract class VehicleRepositoryModule {
 
     @Binds
     abstract fun bindStopRepository(stopRepositoryImpl: StopRepositoryImpl): StopRepository
+
+    @Binds
+    abstract fun bindShapeRepository(shapeRepositoryImpl: ShapeRepositoryImpl): ShapeRepository
 }
 
 @Module
@@ -60,4 +66,9 @@ object VehicleModule {
     @Singleton
     fun provideStopMbtaApiService(retrofit: Retrofit): StopMbtaApiService =
         retrofit.create(StopMbtaApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideShapeMbtaApiService(retrofit: Retrofit): ShapeMbtaApiService =
+        retrofit.create(ShapeMbtaApiService::class.java)
 }

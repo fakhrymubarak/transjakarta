@@ -30,6 +30,9 @@ data class VehicleAttributesDto(
     val longitude: Double? = null,
     @SerialName("updated_at")
     val updatedAt: String? = null,
+    val bearing: Int? = null,
+    @SerialName("direction_id")
+    val directionId: Int? = null,
 )
 
 @Serializable

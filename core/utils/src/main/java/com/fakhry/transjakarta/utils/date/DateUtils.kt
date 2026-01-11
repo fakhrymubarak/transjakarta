@@ -46,8 +46,8 @@ object DateUtils {
         // Legacy fallback
         val inputPatterns = listOf(
             "yyyy-MM-dd'T'HH:mm:ssXXX", // ISO 8601 with time zone (e.g., -04:00)
-            "yyyy-MM-dd'T'HH:mm:ssX",   // ISO 8601 with time zone (e.g., -04)
-            "yyyy-MM-dd'T'HH:mm:ss",     // No time zone
+            "yyyy-MM-dd'T'HH:mm:ssX", // ISO 8601 with time zone (e.g., -04)
+            "yyyy-MM-dd'T'HH:mm:ss", // No time zone
         )
 
         for (pattern in inputPatterns) {

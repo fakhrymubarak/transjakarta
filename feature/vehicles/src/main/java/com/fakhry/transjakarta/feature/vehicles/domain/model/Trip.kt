@@ -5,4 +5,5 @@ data class Trip(
     val name: String,
     val headsign: String,
     val blockId: String,
+    val shapeId: String?,
 )

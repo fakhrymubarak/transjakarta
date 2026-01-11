@@ -70,7 +70,7 @@ class TripRepositoryImplTest {
     fun `getTripById returns trip`() = runTest(testDispatcher) {
         val dto = TripDataDto(
             id = "t1",
-            attributes = TripAttributesDto(name = "T1", headsign = "H1", blockId = "b1")
+            attributes = TripAttributesDto(name = "T1", headsign = "H1", blockId = "b1"),
         )
         val api = RecordingTripService()
         api.singleResponse = TripResponse(data = dto)

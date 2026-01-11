@@ -31,6 +31,21 @@ private fun formatCoordinates(latitude: Double, longitude: Double): String =
 fun VehicleDetailWithRelations.toUiModel(): VehicleDetailUiModel {
     val vehicle = this.vehicle
 
+    val routeDirection = this.route?.let { route ->
+        val destinations = route.directionDestinations
+        val directionId = vehicle.directionId ?: return@let null
+
+        if (destinations.size >= 2) {
+            if (directionId == 0) {
+                "${destinations[1]} -> ${destinations[0]}"
+            } else {
+                "${destinations[0]} -> ${destinations[1]}"
+            }
+        } else {
+            null
+        }
+    }
+
     val routeLabel = this.route?.let { route ->
         listOfNotNull(
             route.shortName.takeUnless { it.isBlank() },
@@ -50,11 +65,14 @@ fun VehicleDetailWithRelations.toUiModel(): VehicleDetailUiModel {
         currentStatus = vehicle.currentStatus,
         statusLabel = formatStatus(vehicle.currentStatus),
         updatedAtLabel = DateUtils.formatUpdatedAt(vehicle.updatedAt),
+        routeDirection = routeDirection.orEmpty(),
         routeLabel = routeLabel.ifBlank { "Unknown Route" },
         tripLabel = tripLabel.ifBlank { "Unknown Trip" },
         stopLabel = stopLabel.ifBlank { "Unknown Stop" },
         latitude = vehicle.latitude,
         longitude = vehicle.longitude,
         coordinatesLabel = formatCoordinates(vehicle.latitude, vehicle.longitude),
+        bearing = vehicle.bearing?.toFloat() ?: 0f,
+        encodedPolyline = this.shape?.polyline.orEmpty(),
     )
 }

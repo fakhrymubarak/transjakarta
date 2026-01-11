@@ -31,6 +31,7 @@ annotationJvm = "1.9.1"
 composeShimmer = "1.3.2"
 mapsCompose = "6.4.0"
 secretsGradlePlugin = "2.0.1"
+mapsUtils = "3.8.2"
 
 [libraries]
 android-gradle = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -82,6 +83,7 @@ androidx-annotation-jvm = { group = "androidx.annotation", name = "annotation-jv
 compose-shimmer = { group = "com.valentinilk.shimmer", name = "compose-shimmer", version.ref = "composeShimmer" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 secretsGradlePlugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+maps-utils = { group = "com.google.maps.android", name = "android-maps-utils", version.ref = "mapsUtils" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -7,6 +7,7 @@ fun RouteDataDto.toRoute() = Route(
     id = id,
     shortName = attributes?.shortName.orEmpty(),
     longName = attributes?.longName.orEmpty(),
+    directionDestinations = attributes?.directionDestinations.orEmpty(),
 )
 
 fun List<RouteDataDto>.toRoutes(): List<Route> = map { it.toRoute() }

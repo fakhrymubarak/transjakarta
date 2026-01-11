@@ -9,6 +9,9 @@ dependencies {
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 
+    // Maps
+    implementation(libs.maps.utils)
+
     // Testing
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.jupiter.engine)

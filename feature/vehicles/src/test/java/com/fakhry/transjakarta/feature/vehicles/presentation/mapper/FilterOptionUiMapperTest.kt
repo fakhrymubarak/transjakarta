@@ -9,25 +9,43 @@ class FilterOptionUiMapperTest {
 
     @Test
     fun `route maps to label preferring short name then long name then id`() {
-        val route = Route(id = "id-1", shortName = "short", longName = "long")
+        val route = Route(id = "id-1", shortName = "short", longName = "long", directionDestinations = emptyList())
         assertEquals("short", route.toFilterOptionUiModel().label)
 
-        val noShort = Route(id = "id-2", shortName = "", longName = "long")
+        val noShort = Route(id = "id-2", shortName = "", longName = "long", directionDestinations = emptyList())
         assertEquals("long", noShort.toFilterOptionUiModel().label)
 
-        val fallback = Route(id = "id-3", shortName = "", longName = "")
+        val fallback = Route(id = "id-3", shortName = "", longName = "", directionDestinations = emptyList())
         assertEquals("id-3", fallback.toFilterOptionUiModel().label)
     }
 
     @Test
     fun `trip maps to label with id suffix for uniqueness`() {
-        val trip = Trip(id = "trip-1", name = "Name", headsign = "Head", blockId = "block")
+        val trip = Trip(
+            id = "trip-1",
+            name = "Name",
+            headsign = "Head",
+            blockId = "block",
+            shapeId = null,
+        )
         assertEquals("Name • trip-1", trip.toFilterOptionUiModel().label)
 
-        val noName = Trip(id = "trip-2", name = "", headsign = "Head", blockId = "block")
+        val noName = Trip(
+            id = "trip-2",
+            name = "",
+            headsign = "Head",
+            blockId = "block",
+            shapeId = null,
+        )
         assertEquals("Head • trip-2", noName.toFilterOptionUiModel().label)
 
-        val fallback = Trip(id = "trip-3", name = "", headsign = "", blockId = "block")
+        val fallback = Trip(
+            id = "trip-3",
+            name = "",
+            headsign = "",
+            blockId = "block",
+            shapeId = null,
+        )
         assertEquals("trip-3", fallback.toFilterOptionUiModel().label)
     }
 }

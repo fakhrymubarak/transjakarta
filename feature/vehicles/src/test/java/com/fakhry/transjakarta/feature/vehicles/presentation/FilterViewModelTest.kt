@@ -36,8 +36,8 @@ class FilterViewModelTest {
         routeRepository = FakeRouteRepository(
             result = DomainResult.Success(
                 listOf(
-                    Route(id = "route-1", shortName = "1", longName = "Route One"),
-                    Route(id = "route-2", shortName = "2", longName = "Route Two"),
+                    Route(id = "route-1", shortName = "1", longName = "Route One", directionDestinations = emptyList()),
+                    Route(id = "route-2", shortName = "2", longName = "Route Two", directionDestinations = emptyList()),
                 ),
             ),
         )
@@ -172,7 +172,7 @@ class FilterViewModelTest {
     @Test
     fun `network error shows friendly message`() = runTest(testDispatcher) {
         routeRepository = FakeRouteRepository(
-            result = DomainResult.Error("Timeout", isNetworkError = true)
+            result = DomainResult.Error("Timeout", isNetworkError = true),
         )
         val viewModel = FilterViewModel(routeRepository, tripRepository)
 

@@ -4,4 +4,5 @@ data class Route(
     val id: String,
     val shortName: String,
     val longName: String,
+    val directionDestinations: List<String>,
 )

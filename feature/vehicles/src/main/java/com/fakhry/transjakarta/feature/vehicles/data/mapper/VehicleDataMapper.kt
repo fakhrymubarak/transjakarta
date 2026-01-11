@@ -26,4 +26,6 @@ fun VehicleDataDto.toVehicleDetail(): VehicleDetail = VehicleDetail(
     routeId = relationships?.route?.data?.id,
     tripId = relationships?.trip?.data?.id,
     stopId = relationships?.stop?.data?.id,
+    bearing = attributes?.bearing,
+    directionId = attributes?.directionId,
 )

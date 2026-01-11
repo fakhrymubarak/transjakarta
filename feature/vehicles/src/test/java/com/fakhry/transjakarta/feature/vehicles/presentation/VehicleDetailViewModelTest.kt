@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.fakhry.transjakarta.core.designsystem.state.UiState
 import com.fakhry.transjakarta.core.domain.DomainResult
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Route
+import com.fakhry.transjakarta.feature.vehicles.domain.model.Shape
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Stop
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Trip
 import com.fakhry.transjakarta.feature.vehicles.domain.model.TripFilters
@@ -11,6 +12,7 @@ import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleDetail
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleFilters
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.RouteRepository
+import com.fakhry.transjakarta.feature.vehicles.domain.repository.ShapeRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.StopRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.TripRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.VehicleRepository
@@ -57,6 +59,8 @@ class VehicleDetailViewModelTest {
                 routeId = "route-1",
                 tripId = "trip-1",
                 stopId = "stop-1",
+                bearing = 100,
+                directionId = 0,
             )
         val routeResult =
             DomainResult.Success(
@@ -64,6 +68,7 @@ class VehicleDetailViewModelTest {
                     id = "route-1",
                     shortName = "10",
                     longName = "Route 10",
+                    directionDestinations = emptyList(),
                 ),
             )
         val tripResult =
@@ -73,6 +78,7 @@ class VehicleDetailViewModelTest {
                     name = "Trip 1",
                     headsign = "HS",
                     blockId = "b1",
+                    shapeId = "shape-1",
                 ),
             )
         val stopResult =
@@ -98,7 +104,6 @@ class VehicleDetailViewModelTest {
         val vm = VehicleDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
             getVehicleDetailWithRelations = useCase,
-            vehicleRepository = vehicleRepository,
         )
 
         advanceTimeBy(1000)
@@ -126,7 +131,6 @@ class VehicleDetailViewModelTest {
         val vm = VehicleDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
             getVehicleDetailWithRelations = useCase,
-            vehicleRepository = vehicleRepository,
         )
 
         advanceTimeBy(1000)
@@ -149,7 +153,6 @@ class VehicleDetailViewModelTest {
         val vm = VehicleDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
             getVehicleDetailWithRelations = useCase,
-            vehicleRepository = fakeRepo,
         )
 
         advanceTimeBy(1000)
@@ -175,7 +178,6 @@ class VehicleDetailViewModelTest {
         val vm = VehicleDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
             getVehicleDetailWithRelations = useCase,
-            vehicleRepository = fakeRepo,
         )
 
         advanceTimeBy(1000)
@@ -200,7 +202,6 @@ class VehicleDetailViewModelTest {
         val vm = VehicleDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
             getVehicleDetailWithRelations = useCase,
-            vehicleRepository = fakeRepo,
         )
 
         advanceTimeBy(1000)
@@ -219,6 +220,8 @@ class VehicleDetailViewModelTest {
         routeId = "route-1",
         tripId = "trip-1",
         stopId = "stop-1",
+        bearing = 0,
+        directionId = 0,
     )
 
     class FakeVehicleRepository : VehicleRepository {
@@ -244,6 +247,7 @@ class VehicleDetailViewModelTest {
         routeResult: DomainResult<Route> = DomainResult.Empty as DomainResult<Route>,
         tripResult: DomainResult<Trip> = DomainResult.Empty as DomainResult<Trip>,
         stopResult: DomainResult<Stop> = DomainResult.Empty as DomainResult<Stop>,
+        shapeResult: DomainResult<Shape> = DomainResult.Empty as DomainResult<Shape>,
         ioContext: kotlin.coroutines.CoroutineContext = dispatcher,
     ): GetVehicleDetailWithRelationsUseCase = GetVehicleDetailWithRelationsUseCase(
         vehicleRepository = vehicleRepository,
@@ -259,6 +263,9 @@ class VehicleDetailViewModelTest {
         },
         stopRepository = object : StopRepository {
             override suspend fun getStop(id: String): DomainResult<Stop> = stopResult
+        },
+        shapeRepository = object : ShapeRepository {
+            override suspend fun getShapeById(id: String): DomainResult<Shape> = shapeResult
         },
         ioContext = ioContext,
     )

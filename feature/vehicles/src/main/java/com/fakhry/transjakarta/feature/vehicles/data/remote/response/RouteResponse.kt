@@ -27,4 +27,6 @@ data class RouteAttributesDto(
     @SerialName("long_name")
     val longName: String? = null,
     val description: String? = null,
+    @SerialName("direction_destinations")
+    val directionDestinations: List<String>? = null,
 )

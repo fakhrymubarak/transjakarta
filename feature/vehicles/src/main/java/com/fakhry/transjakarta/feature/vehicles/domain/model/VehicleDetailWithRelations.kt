@@ -5,4 +5,5 @@ data class VehicleDetailWithRelations(
     val route: Route?,
     val trip: Trip?,
     val stop: Stop?,
+    val shape: Shape?,
 )

@@ -215,6 +215,7 @@ class TripPagingSourceTest {
                 name = "Trip $i",
                 headsign = "Headsign $i",
                 blockId = "BlockId $i",
+                shapeId = null,
             )
         }
 }

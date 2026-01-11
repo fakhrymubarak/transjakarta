@@ -8,6 +8,7 @@ fun TripDataDto.toTrip() = Trip(
     name = attributes?.name.orEmpty(),
     headsign = attributes?.headsign.orEmpty(),
     blockId = attributes?.blockId.orEmpty(),
+    shapeId = relationships?.shape?.data?.id,
 )
 
 fun List<TripDataDto>.toTrips(): List<Trip> = map { it.toTrip() }

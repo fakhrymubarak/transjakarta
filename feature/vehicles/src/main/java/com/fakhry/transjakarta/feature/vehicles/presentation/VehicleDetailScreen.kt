@@ -32,6 +32,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,11 +55,23 @@ fun VehicleDetailScreen(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (uiState) {
-        is UiState.Loading -> VehicleDetailPlaceholder(modifier)
-        is UiState.Empty -> EmptyState(modifier, onRetry)
-        is UiState.Error -> ErrorState(modifier, uiState.message, uiState.isNetworkError, onRetry)
-        is UiState.Success -> SuccessState(modifier, uiState.data)
+    androidx.compose.material3.Scaffold(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { innerPadding ->
+        val contentModifier = Modifier.padding(innerPadding)
+        when (uiState) {
+            is UiState.Loading -> VehicleDetailPlaceholder(contentModifier)
+            is UiState.Empty -> EmptyState(contentModifier, onRetry)
+            is UiState.Error -> ErrorState(
+                contentModifier,
+                uiState.message,
+                uiState.isNetworkError,
+                onRetry
+            )
+
+            is UiState.Success -> SuccessState(contentModifier, uiState.data)
+        }
     }
 }
 
@@ -138,11 +154,15 @@ private fun ErrorState(
 @Composable
 private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
     val scrollState = rememberScrollState()
+    var isMapInteracting by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
+            .verticalScroll(
+                state = scrollState,
+                enabled = !isMapInteracting,
+            )
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -195,6 +215,7 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
                 Text(
                     text = vehicle.routeLabel,
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             },
         )
@@ -206,6 +227,7 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
                 Text(
                     text = vehicle.tripLabel,
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             },
         )
@@ -217,6 +239,7 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
                 Text(
                     text = vehicle.stopLabel,
                     style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             },
         )
@@ -226,6 +249,9 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
             latitude = vehicle.latitude,
             longitude = vehicle.longitude,
             label = vehicle.label,
+            bearing = vehicle.bearing,
+            encodedPolyline = vehicle.encodedPolyline,
+            onMapInteraction = { isMapInteracting = it },
         )
     }
 }

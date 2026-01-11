@@ -10,4 +10,6 @@ data class VehicleDetail(
     val routeId: String?,
     val tripId: String?,
     val stopId: String?,
+    val bearing: Int?,
+    val directionId: Int?,
 )

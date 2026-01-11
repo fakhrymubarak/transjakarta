@@ -3,10 +3,12 @@ package com.fakhry.transjakarta.feature.vehicles.domain.usecase
 import androidx.annotation.VisibleForTesting
 import com.fakhry.transjakarta.core.domain.DomainResult
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Route
+import com.fakhry.transjakarta.feature.vehicles.domain.model.Shape
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Stop
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Trip
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleDetailWithRelations
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.RouteRepository
+import com.fakhry.transjakarta.feature.vehicles.domain.repository.ShapeRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.StopRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.TripRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.VehicleRepository
@@ -22,6 +24,7 @@ class GetVehicleDetailWithRelationsUseCase @Inject constructor(
     private val routeRepository: RouteRepository,
     private val tripRepository: TripRepository,
     private val stopRepository: StopRepository,
+    private val shapeRepository: ShapeRepository,
 ) {
     private var ioContext: CoroutineContext = Dispatchers.IO
 
@@ -31,8 +34,15 @@ class GetVehicleDetailWithRelationsUseCase @Inject constructor(
         routeRepository: RouteRepository,
         tripRepository: TripRepository,
         stopRepository: StopRepository,
+        shapeRepository: ShapeRepository,
         ioContext: CoroutineContext,
-    ) : this(vehicleRepository, routeRepository, tripRepository, stopRepository) {
+    ) : this(
+        vehicleRepository,
+        routeRepository,
+        tripRepository,
+        stopRepository,
+        shapeRepository,
+    ) {
         this.ioContext = ioContext
     }
 
@@ -58,12 +68,16 @@ class GetVehicleDetailWithRelationsUseCase @Inject constructor(
                         val tripDeferred = async { tripId?.let { safeTripDetail(it) } }
                         val stopDeferred = async { stopId?.let { safeStopDetail(it) } }
 
+                        val trip = tripDeferred.await()
+                        val shapeDeferred = async { trip?.shapeId?.let { safeShapeDetail(it) } }
+
                         DomainResult.Success(
                             VehicleDetailWithRelations(
                                 vehicle = vehicle,
                                 route = routeDeferred.await(),
-                                trip = tripDeferred.await(),
+                                trip = trip,
                                 stop = stopDeferred.await(),
+                                shape = shapeDeferred.await(),
                             ),
                         )
                     }
@@ -85,6 +99,12 @@ class GetVehicleDetailWithRelationsUseCase @Inject constructor(
 
     private suspend fun safeStopDetail(id: String): Stop? =
         when (val result: DomainResult<Stop> = stopRepository.getStop(id)) {
+            is DomainResult.Success -> result.data
+            else -> null
+        }
+
+    private suspend fun safeShapeDetail(id: String): Shape? =
+        when (val result: DomainResult<Shape> = shapeRepository.getShapeById(id)) {
             is DomainResult.Success -> result.data
             else -> null
         }

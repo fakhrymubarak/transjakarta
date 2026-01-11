@@ -8,10 +8,13 @@ data class VehicleDetailUiModel(
     val currentStatus: VehicleStatus,
     val statusLabel: String,
     val updatedAtLabel: String,
+    val routeDirection: String,
     val routeLabel: String,
     val tripLabel: String,
     val stopLabel: String,
     val latitude: Double,
     val longitude: Double,
     val coordinatesLabel: String,
+    val bearing: Float,
+    val encodedPolyline: String,
 )

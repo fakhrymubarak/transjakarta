@@ -59,7 +59,7 @@ class RouteRepositoryImplTest {
     fun `getRouteById returns mapped route`() = runTest {
         val dto = RouteDataDto(
             id = "r1",
-            attributes = RouteAttributesDto(shortName = "sn", longName = "ln")
+            attributes = RouteAttributesDto(shortName = "sn", longName = "ln"),
         )
         val api = RecordingRouteService(mapOf())
         api.singleResponse = RouteResponse(data = dto)

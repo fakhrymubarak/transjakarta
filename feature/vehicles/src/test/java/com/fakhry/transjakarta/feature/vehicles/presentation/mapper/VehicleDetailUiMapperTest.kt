@@ -16,11 +16,11 @@ class VehicleDetailUiMapperTest {
     @Test
     fun `maps full detail with relations correctly`() {
         val vehicle = createVehicle("v1", "Bus 1", "route-1", "trip-1", "stop-1")
-        val route = Route("route-1", "10", "Main Route")
-        val trip = Trip("trip-1", "Downtown", "Morning Trip", "b1")
+        val route = Route("route-1", "10", "Main Route", listOf("Dest A", "Dest B"))
+        val trip = Trip("trip-1", "Downtown", "Morning Trip", "b1", "shape-1")
         val stop = Stop("stop-1", "Central Station", 0.0, 0.0, "City", "1")
 
-        val detail = VehicleDetailWithRelations(vehicle, route, trip, stop)
+        val detail = VehicleDetailWithRelations(vehicle, route, trip, stop, null)
 
         // Set locale/timezone for deterministic date formatting
         Locale.setDefault(Locale.US)
@@ -38,7 +38,7 @@ class VehicleDetailUiMapperTest {
     @Test
     fun `maps missing relations to ids`() {
         val vehicle = createVehicle("v1", "Bus 1", "route-1", "trip-1", "stop-1")
-        val detail = VehicleDetailWithRelations(vehicle, null, null, null)
+        val detail = VehicleDetailWithRelations(vehicle, null, null, null, null)
 
         val ui = detail.toUiModel()
 
@@ -50,7 +50,7 @@ class VehicleDetailUiMapperTest {
     @Test
     fun `maps missing relations and ids to Unknown placeholders`() {
         val vehicle = createVehicle("v1", "Bus 1", null, null, null)
-        val detail = VehicleDetailWithRelations(vehicle, null, null, null)
+        val detail = VehicleDetailWithRelations(vehicle, null, null, null, null)
 
         val ui = detail.toUiModel()
 
@@ -62,8 +62,8 @@ class VehicleDetailUiMapperTest {
     @Test
     fun `maps route with only short name`() {
         val vehicle = createVehicle("v1", "Bus 1", "route-1", null, null)
-        val route = Route("route-1", "10", "")
-        val detail = VehicleDetailWithRelations(vehicle, route, null, null)
+        val route = Route("route-1", "10", "", emptyList())
+        val detail = VehicleDetailWithRelations(vehicle, route, null, null, null)
 
         val ui = detail.toUiModel()
         assertEquals("10", ui.routeLabel)
@@ -72,8 +72,8 @@ class VehicleDetailUiMapperTest {
     @Test
     fun `maps route with only long name`() {
         val vehicle = createVehicle("v1", "Bus 1", "route-1", null, null)
-        val route = Route("route-1", "", "Long Name")
-        val detail = VehicleDetailWithRelations(vehicle, route, null, null)
+        val route = Route("route-1", "", "Long Name", emptyList())
+        val detail = VehicleDetailWithRelations(vehicle, route, null, null, null)
 
         val ui = detail.toUiModel()
         assertEquals("Long Name", ui.routeLabel)
@@ -82,8 +82,8 @@ class VehicleDetailUiMapperTest {
     @Test
     fun `maps trip with name fallback`() {
         val vehicle = createVehicle("v1", "Bus 1", null, "trip-1", null)
-        val trip = Trip("trip-1", "Trip Name", "", "b1") // Empty headsign
-        val detail = VehicleDetailWithRelations(vehicle, null, trip, null)
+        val trip = Trip("trip-1", "Trip Name", "", "b1", null) // Empty headsign
+        val detail = VehicleDetailWithRelations(vehicle, null, trip, null, null)
 
         val ui = detail.toUiModel()
         assertEquals("Trip Name", ui.tripLabel)
@@ -92,8 +92,8 @@ class VehicleDetailUiMapperTest {
     @Test
     fun `maps trip with unscheduled fallback`() {
         val vehicle = createVehicle("v1", "Bus 1", null, "trip-1", null)
-        val trip = Trip("trip-1", "", "", "b1") // Empty name and headsign
-        val detail = VehicleDetailWithRelations(vehicle, null, trip, null)
+        val trip = Trip("trip-1", "", "", "b1", null) // Empty name and headsign
+        val detail = VehicleDetailWithRelations(vehicle, null, trip, null, null)
 
         val ui = detail.toUiModel()
         assertEquals("Unscheduled", ui.tripLabel)
@@ -104,7 +104,7 @@ class VehicleDetailUiMapperTest {
         label: String,
         routeId: String?,
         tripId: String?,
-        stopId: String?
+        stopId: String?,
     ) = VehicleDetail(
         id = id,
         label = label,
@@ -114,6 +114,8 @@ class VehicleDetailUiMapperTest {
         updatedAt = "2024-01-01T12:00:00Z",
         routeId = routeId,
         tripId = tripId,
-        stopId = stopId
+        stopId = stopId,
+        bearing = 0,
+        directionId = 0,
     )
 }

@@ -23,6 +23,6 @@ interface VehicleMbtaApiService {
         @Path("id") id: String,
         @Query("include") include: String = "route,trip,stop",
         @Query("fields[vehicle]")
-        fields: String = "label,current_status,latitude,longitude,updated_at",
+        fields: String = "label,current_status,latitude,longitude,updated_at,bearing",
     ): VehicleResponse
 }

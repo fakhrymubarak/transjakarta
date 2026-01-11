@@ -15,20 +15,18 @@ class StopRepositoryImplTest {
     @Test
     fun `getStop returns mapped stop on success`() = runTest {
         val fakeApi = object : StopMbtaApiService {
-            override suspend fun getStop(id: String, fields: String): StopResponse {
-                return StopResponse(
-                    data = StopDataDto(
-                        id = id,
-                        attributes = StopAttributesDto(
-                            name = "Stop Name",
-                            latitude = 1.0,
-                            longitude = 2.0,
-                            municipality = "City",
-                            platformCode = "PC",
-                        )
-                    )
-                )
-            }
+            override suspend fun getStop(id: String, fields: String): StopResponse = StopResponse(
+                data = StopDataDto(
+                    id = id,
+                    attributes = StopAttributesDto(
+                        name = "Stop Name",
+                        latitude = 1.0,
+                        longitude = 2.0,
+                        municipality = "City",
+                        platformCode = "PC",
+                    ),
+                ),
+            )
         }
         val repository = StopRepositoryImpl(fakeApi)
 
@@ -47,9 +45,8 @@ class StopRepositoryImplTest {
     @Test
     fun `getStop returns error on exception`() = runTest {
         val fakeApi = object : StopMbtaApiService {
-            override suspend fun getStop(id: String, fields: String): StopResponse {
+            override suspend fun getStop(id: String, fields: String): StopResponse =
                 throw RuntimeException("API Error")
-            }
         }
         val repository = StopRepositoryImpl(fakeApi)
 
