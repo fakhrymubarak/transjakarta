@@ -34,7 +34,7 @@ class VehiclePagingSource(
                 filters = filterParams,
                 offset = offset,
                 limit = PAGE_SIZE,
-            ).data.toVehicles()
+            ).data.toVehicles().distinctBy { it.id }
 
             // Determine if there's a next page
             val nextKey = if (vehicles.size < PAGE_SIZE) {

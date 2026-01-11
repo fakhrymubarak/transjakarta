@@ -28,8 +28,6 @@ private fun formatStatus(status: VehicleStatus) = when (status) {
 private fun formatCoordinates(latitude: Double, longitude: Double): String =
     "%.6f, %.6f".format(latitude, longitude)
 
-
-
 fun VehicleDetailWithRelations.toUiModel(): VehicleDetailUiModel {
     val vehicle = this.vehicle
 
@@ -44,9 +42,7 @@ fun VehicleDetailWithRelations.toUiModel(): VehicleDetailUiModel {
         trip.headsign.ifBlank { trip.name.ifBlank { "Unscheduled" } }
     } ?: vehicle.tripId.orEmpty()
 
-    val stopLabel = this.stop?.let { stop ->
-        stop.name
-    } ?: vehicle.stopId.orEmpty()
+    val stopLabel = this.stop?.name ?: vehicle.stopId.orEmpty()
 
     return VehicleDetailUiModel(
         id = vehicle.id,

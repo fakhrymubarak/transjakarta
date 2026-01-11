@@ -184,7 +184,9 @@ private fun VehicleListContent(
                 ) {
                     items(
                         count = lazyPagingItems.itemCount,
-                        key = { index -> lazyPagingItems[index]?.id ?: index },
+                        key = { index ->
+                            lazyPagingItems[index]?.let { "${it.id}_$index" } ?: index
+                        },
                     ) { index ->
                         val vehicle = lazyPagingItems[index]
                         if (vehicle != null) {
