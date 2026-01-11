@@ -3,6 +3,9 @@ package com.fakhry.transjakarta.feature.vehicles.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.fakhry.transjakarta.core.domain.DomainResult
+import com.fakhry.transjakarta.core.networking.util.mapNetworkCall
+import com.fakhry.transjakarta.feature.vehicles.data.mapper.toTrip
 import com.fakhry.transjakarta.feature.vehicles.data.paging.TripPagingSource
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.TripMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Trip
@@ -28,4 +31,7 @@ class TripRepositoryImpl @Inject constructor(
             pagingSourceFactory = { TripPagingSource(api, filters) },
         ).flow
     }
+
+    override suspend fun getTripById(id: String): DomainResult<Trip> =
+        mapNetworkCall { api.getTrip(id).data.toTrip() }
 }

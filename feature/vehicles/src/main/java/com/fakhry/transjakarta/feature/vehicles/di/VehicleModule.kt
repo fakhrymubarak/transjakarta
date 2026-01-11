@@ -1,12 +1,15 @@
 package com.fakhry.transjakarta.feature.vehicles.di
 
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.RouteMbtaApiService
+import com.fakhry.transjakarta.feature.vehicles.data.remote.service.StopMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.TripMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.VehicleMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.data.repository.RouteRepositoryImpl
+import com.fakhry.transjakarta.feature.vehicles.data.repository.StopRepositoryImpl
 import com.fakhry.transjakarta.feature.vehicles.data.repository.TripRepositoryImpl
 import com.fakhry.transjakarta.feature.vehicles.data.repository.VehicleRepositoryImpl
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.RouteRepository
+import com.fakhry.transjakarta.feature.vehicles.domain.repository.StopRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.TripRepository
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.VehicleRepository
 import dagger.Binds
@@ -30,6 +33,9 @@ abstract class VehicleRepositoryModule {
 
     @Binds
     abstract fun bindTripRepository(tripRepositoryImpl: TripRepositoryImpl): TripRepository
+
+    @Binds
+    abstract fun bindStopRepository(stopRepositoryImpl: StopRepositoryImpl): StopRepository
 }
 
 @Module
@@ -49,4 +55,9 @@ object VehicleModule {
     @Singleton
     fun provideTripMbtaApiService(retrofit: Retrofit): TripMbtaApiService =
         retrofit.create(TripMbtaApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideStopMbtaApiService(retrofit: Retrofit): StopMbtaApiService =
+        retrofit.create(StopMbtaApiService::class.java)
 }

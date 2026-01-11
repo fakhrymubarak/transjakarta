@@ -30,6 +30,8 @@ hilt {
 }
 
 dependencies {
+    implementation(project(":core:domain"))
+
     // Serialization
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)

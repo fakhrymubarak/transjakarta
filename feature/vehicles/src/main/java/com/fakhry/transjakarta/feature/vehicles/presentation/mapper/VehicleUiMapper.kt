@@ -1,7 +1,9 @@
 package com.fakhry.transjakarta.feature.vehicles.presentation.mapper
 
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Vehicle
+import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleDetailWithRelations
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
+import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleDetailUiModel
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleUiModel
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -66,3 +68,36 @@ private fun extractTimeZone(updatedAt: String): TimeZone? {
 }
 
 private val timeZoneRegex = Regex("([+-]\\d{2}:\\d{2}|Z)$")
+
+fun VehicleDetailWithRelations.toUiModel(): VehicleDetailUiModel {
+    val vehicle = this.vehicle
+
+    val routeLabel = this.route?.let { route ->
+        listOfNotNull(
+            route.shortName.takeUnless { it.isBlank() },
+            route.longName.takeUnless { it.isBlank() },
+        ).distinct().joinToString(" - ")
+    } ?: vehicle.routeId.orEmpty()
+
+    val tripLabel = this.trip?.let { trip ->
+        trip.headsign.ifBlank { trip.name.ifBlank { "Unscheduled" } }
+    } ?: vehicle.tripId.orEmpty()
+
+    val stopLabel = this.stop?.let { stop ->
+        stop.name
+    } ?: vehicle.stopId.orEmpty()
+
+    return VehicleDetailUiModel(
+        id = vehicle.id,
+        label = vehicle.label,
+        currentStatus = vehicle.currentStatus,
+        statusLabel = formatStatus(vehicle.currentStatus),
+        updatedAtLabel = formatUpdatedAt(vehicle.updatedAt),
+        routeLabel = routeLabel.ifBlank { "Unknown Route" },
+        tripLabel = tripLabel.ifBlank { "Unknown Trip" },
+        stopLabel = stopLabel.ifBlank { "Unknown Stop" },
+        latitude = vehicle.latitude,
+        longitude = vehicle.longitude,
+        coordinatesLabel = formatCoordinates(vehicle.latitude, vehicle.longitude),
+    )
+}

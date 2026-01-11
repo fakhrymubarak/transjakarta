@@ -244,4 +244,6 @@ private class FakeTripMbtaApiService : TripMbtaApiService {
         error?.let { throw it }
         return response ?: TripsResponse(emptyList())
     }
+
+    override suspend fun getTrip(id: String, fields: String) = error("not used in paging tests")
 }

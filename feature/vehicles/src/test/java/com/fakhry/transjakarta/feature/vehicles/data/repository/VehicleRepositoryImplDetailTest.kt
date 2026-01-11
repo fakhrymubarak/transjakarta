@@ -50,11 +50,8 @@ class VehicleRepositoryImplDetailTest {
                 fields: String,
             ) = error("not used")
 
-            override suspend fun getVehicle(
-                id: String,
-                include: String,
-                fields: String,
-            ) = throw IOException("boom")
+            override suspend fun getVehicle(id: String, include: String, fields: String) =
+                throw IOException("boom")
         }
         val repository = VehicleRepositoryImpl(api)
 

@@ -1,6 +1,8 @@
 package com.fakhry.transjakarta.feature.vehicles.data.repository
 
 import com.fakhry.transjakarta.core.domain.DomainResult
+import com.fakhry.transjakarta.core.networking.util.mapNetworkCall
+import com.fakhry.transjakarta.feature.vehicles.data.mapper.toRoute
 import com.fakhry.transjakarta.feature.vehicles.data.mapper.toRoutes
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.RouteMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Route
@@ -47,6 +49,12 @@ class RouteRepositoryImpl @Inject constructor(
                 )
             }
         }
+    }
+
+    override suspend fun getRouteById(id: String): DomainResult<Route> {
+        cachedRoutes?.firstOrNull { it.id == id }?.let { return DomainResult.Success(it) }
+
+        return mapNetworkCall { api.getRoute(id).data.toRoute() }
     }
 
     companion object {

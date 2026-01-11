@@ -4,6 +4,7 @@ import androidx.paging.testing.asSnapshot
 import com.fakhry.transjakarta.feature.vehicles.data.paging.TripPagingSource
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripAttributesDto
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripDataDto
+import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripsResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.TripMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.domain.model.TripFilters
@@ -85,5 +86,8 @@ class TripRepositoryImplTest {
             calls += Call(filters, offset, limit, fields)
             return response
         }
+
+        override suspend fun getTrip(id: String, fields: String): TripResponse =
+            error("not used in test")
     }
 }

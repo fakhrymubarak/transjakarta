@@ -65,5 +65,7 @@ class RouteRepositoryImplTest {
             callsLimits += limit
             return responses[offset] ?: RoutesResponse(emptyList())
         }
+
+        override suspend fun getRoute(id: String, fields: String) = error("not used in test")
     }
 }

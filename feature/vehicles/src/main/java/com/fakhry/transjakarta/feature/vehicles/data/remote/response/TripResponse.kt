@@ -9,6 +9,11 @@ data class TripsResponse(
 )
 
 @Serializable
+data class TripResponse(
+    val data: TripDataDto,
+)
+
+@Serializable
 data class TripDataDto(
     val id: String,
     val type: String? = null,

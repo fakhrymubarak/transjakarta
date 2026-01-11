@@ -9,6 +9,11 @@ data class RoutesResponse(
 )
 
 @Serializable
+data class RouteResponse(
+    val data: RouteDataDto,
+)
+
+@Serializable
 data class RouteDataDto(
     val id: String,
     val type: String? = null,

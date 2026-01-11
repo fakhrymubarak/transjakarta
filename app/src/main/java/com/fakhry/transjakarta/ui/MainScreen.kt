@@ -28,7 +28,8 @@ private enum class BottomNavItem(
     val title: String,
     val icon: ImageVector,
 ) {
-    List("List", Icons.AutoMirrored.Filled.List), Map("Map", Icons.Default.Place),
+    List("List", Icons.AutoMirrored.Filled.List),
+    Map("Map", Icons.Default.Place),
 }
 
 @Composable

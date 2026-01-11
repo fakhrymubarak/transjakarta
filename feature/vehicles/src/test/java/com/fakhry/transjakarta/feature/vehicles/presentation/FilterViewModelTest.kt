@@ -179,11 +179,14 @@ private class FakeRouteRepository(
     private val result: DomainResult<List<Route>>,
 ) : RouteRepository {
     override suspend fun getRoutes(): DomainResult<List<Route>> = result
+    override suspend fun getRouteById(id: String): DomainResult<Route> = DomainResult.Empty
 }
 
 private class FakeTripRepository : TripRepository {
     override fun getTripsPagingFlow(filters: TripFilters): Flow<PagingData<Trip>> =
         flowOf(PagingData.from(emptyList()))
+
+    override suspend fun getTripById(id: String): DomainResult<Trip> = DomainResult.Empty
 }
 
 private class RecordingTripRepository : TripRepository {
@@ -193,4 +196,6 @@ private class RecordingTripRepository : TripRepository {
         calls += filters
         return flowOf(PagingData.from(emptyList()))
     }
+
+    override suspend fun getTripById(id: String): DomainResult<Trip> = DomainResult.Empty
 }

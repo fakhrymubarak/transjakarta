@@ -1,7 +1,9 @@
 package com.fakhry.transjakarta.feature.vehicles.data.remote.service
 
+import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RouteResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RoutesResponse
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RouteMbtaApiService {
@@ -11,4 +13,10 @@ interface RouteMbtaApiService {
         @Query("page[limit]") limit: Int,
         @Query("fields[route]") fields: String = "short_name,long_name",
     ): RoutesResponse
+
+    @GET("routes/{id}")
+    suspend fun getRoute(
+        @Path("id") id: String,
+        @Query("fields[route]") fields: String = "short_name,long_name,description",
+    ): RouteResponse
 }

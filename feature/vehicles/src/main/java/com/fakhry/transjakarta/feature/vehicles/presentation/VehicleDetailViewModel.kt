@@ -5,25 +5,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fakhry.transjakarta.core.designsystem.state.UiState
 import com.fakhry.transjakarta.core.domain.DomainResult
-import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleDetail
-import com.fakhry.transjakarta.feature.vehicles.domain.repository.VehicleRepository
+import com.fakhry.transjakarta.feature.vehicles.domain.usecase.GetVehicleDetailWithRelationsUseCase
+import com.fakhry.transjakarta.feature.vehicles.presentation.mapper.toUiModel
+import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleDetailUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class VehicleDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: VehicleRepository,
+    private val getVehicleDetailWithRelations: GetVehicleDetailWithRelationsUseCase,
 ) : ViewModel() {
     private val vehicleId: String = checkNotNull(savedStateHandle["vehicleId"])
 
-    private val _uiState: MutableStateFlow<UiState<VehicleDetail>> =
+    private val _uiState: MutableStateFlow<UiState<VehicleDetailUiModel>> =
         MutableStateFlow(UiState.Loading)
-    val uiState: StateFlow<UiState<VehicleDetail>> = _uiState.asStateFlow()
+    val uiState: StateFlow<UiState<VehicleDetailUiModel>> = _uiState.asStateFlow()
 
     init {
         loadDetail()
@@ -36,15 +37,19 @@ class VehicleDetailViewModel @Inject constructor(
     private fun loadDetail() {
         _uiState.value = UiState.Loading
         viewModelScope.launch {
-            when (val result = repository.getVehicleDetail(vehicleId)) {
-                is DomainResult.Success -> _uiState.value = UiState.Success(result.data)
-                is DomainResult.Error -> _uiState.value =
-                    UiState.Error(
-                        message = result.message,
-                        code = result.code,
-                        data = result.data,
-                        isNetworkError = result.isNetworkError,
-                    )
+            when (val result = getVehicleDetailWithRelations(vehicleId)) {
+                is DomainResult.Success -> {
+                    _uiState.value = UiState.Success(result.data.toUiModel())
+                }
+                is DomainResult.Error -> {
+                    _uiState.value =
+                        UiState.Error(
+                            message = result.message,
+                            code = result.code,
+                            data = result.data?.toUiModel(),
+                            isNetworkError = result.isNetworkError,
+                        )
+                }
 
                 is DomainResult.Empty -> _uiState.value = UiState.Empty
             }
