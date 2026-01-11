@@ -1,7 +1,6 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.transjakarta.library)
+    alias(libs.plugins.secrets.gradle.plugin)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -13,15 +12,6 @@ android {
     }
 
     defaultConfig {
-        val localProperties =
-            Properties().apply {
-                val localPropertiesFile = rootProject.file("local.properties")
-                if (localPropertiesFile.exists()) {
-                    localPropertiesFile.inputStream().use { load(it) }
-                }
-            }
-        val mbtaApiKey = localProperties.getProperty("MBTA_API_KEY") ?: ""
-        buildConfigField("String", "MBTA_API_KEY", "\"$mbtaApiKey\"")
     }
 }
 
@@ -46,4 +36,9 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit)
+}
+
+secrets {
+    propertiesFileName = "secret.properties"
+    defaultPropertiesFileName = "default.properties"
 }

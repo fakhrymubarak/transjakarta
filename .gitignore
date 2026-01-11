@@ -16,5 +16,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+secret.properties
 AGENTS.md
 .agent

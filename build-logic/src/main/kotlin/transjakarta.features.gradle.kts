@@ -24,6 +24,7 @@ dependencies {
             LibraryAliases.COMPOSE_UI_TOOLING_PREVIEW,
             LibraryAliases.COMPOSE_MATERIAL_ICONS_EXTENDED,
             LibraryAliases.COMPOSE_SHIMMER,
+            LibraryAliases.MAPS_COMPOSE,
 
             // Hilt
             LibraryAliases.ANDROIDX_LIFECYCLE_RUNTIME_KTX,

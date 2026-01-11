@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +45,14 @@ import com.fakhry.transjakarta.core.designsystem.state.UiState
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleStatus
 import com.fakhry.transjakarta.feature.vehicles.presentation.components.VehicleDetailPlaceholder
 import com.fakhry.transjakarta.feature.vehicles.presentation.model.VehicleDetailUiModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun VehicleDetailScreen(
@@ -237,27 +246,28 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center,
+                    .height(200.dp),
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Default.Map,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.primary,
+                val vehicleLocation = LatLng(vehicle.latitude, vehicle.longitude)
+                val cameraPositionState = rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(vehicleLocation, 15f)
+                }
+
+                LaunchedEffect(vehicleLocation) {
+                    cameraPositionState.animate(
+                        update = CameraUpdateFactory.newLatLng(vehicleLocation),
+                        durationMs = 1000
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Map View",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = vehicle.coordinatesLabel,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline,
+                }
+
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState,
+                    uiSettings = MapUiSettings(zoomControlsEnabled = false),
+                ) {
+                    Marker(
+                        state = MarkerState(position = vehicleLocation),
+                        title = vehicle.label,
                     )
                 }
             }

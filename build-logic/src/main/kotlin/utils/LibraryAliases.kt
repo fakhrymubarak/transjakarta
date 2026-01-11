@@ -15,4 +15,5 @@ object LibraryAliases {
     const val JUNIT_PLATFORM_LAUNCHER = "junit-platform-launcher"
     const val KOTLINX_COLLECTIONS_IMMUTABLE = "kotlinx-collections-immutable"
     const val COMPOSE_SHIMMER = "compose-shimmer"
+    const val MAPS_COMPOSE = "maps-compose"
 }

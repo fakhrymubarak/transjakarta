@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -86,9 +86,11 @@ class VehicleDetailViewModelTest {
                     platformCode = "1",
                 ),
             )
+
+        val vehicleRepository = createVehicleRepository(DomainResult.Success(vehicleDetail))
         val useCase =
             buildUseCase(
-                vehicleResult = DomainResult.Success(vehicleDetail),
+                vehicleRepository = vehicleRepository,
                 routeResult = routeResult,
                 tripResult = tripResult,
                 stopResult = stopResult,
@@ -96,49 +98,62 @@ class VehicleDetailViewModelTest {
         val vm = VehicleDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
             getVehicleDetailWithRelations = useCase,
+            vehicleRepository = vehicleRepository,
         )
 
-        advanceUntilIdle()
+        advanceTimeBy(1000)
 
         val state = vm.uiState.value
         val success = state as UiState.Success
         assertEquals("v1", success.data.id)
         assertEquals("Bus 1", success.data.label)
+
+        vm.pollJob?.cancel()
     }
 
     @Test
     fun `network error sets ui error with flag`() = scope.runTest {
+        val vehicleRepository = createVehicleRepository(
+            DomainResult.Error(
+                message = "Network error",
+                isNetworkError = true,
+            ),
+        )
         val useCase =
             buildUseCase(
-                vehicleResult = DomainResult.Error(
-                    message = "Network error",
-                    isNetworkError = true,
-                ),
+                vehicleRepository = vehicleRepository,
             )
         val vm = VehicleDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
             getVehicleDetailWithRelations = useCase,
+            vehicleRepository = vehicleRepository,
         )
 
-        advanceUntilIdle()
+        advanceTimeBy(1000)
 
         val state = vm.uiState.value as UiState.Error
         assertTrue(state.isNetworkError)
+
+        vm.pollJob?.cancel()
+    }
+
+    private fun createVehicleRepository(
+        vehicleResult: DomainResult<VehicleDetail>,
+    ): VehicleRepository = object : VehicleRepository {
+        override fun getVehiclesPagingFlow(filters: VehicleFilters) = error("not used")
+
+        override suspend fun getVehicleDetail(id: String): DomainResult<VehicleDetail> =
+            vehicleResult
     }
 
     private fun buildUseCase(
-        vehicleResult: DomainResult<VehicleDetail>,
+        vehicleRepository: VehicleRepository,
         routeResult: DomainResult<Route> = DomainResult.Empty as DomainResult<Route>,
         tripResult: DomainResult<Trip> = DomainResult.Empty as DomainResult<Trip>,
         stopResult: DomainResult<Stop> = DomainResult.Empty as DomainResult<Stop>,
         ioContext: kotlin.coroutines.CoroutineContext = dispatcher,
     ): GetVehicleDetailWithRelationsUseCase = GetVehicleDetailWithRelationsUseCase(
-        vehicleRepository = object : VehicleRepository {
-            override fun getVehiclesPagingFlow(filters: VehicleFilters) = error("not used")
-
-            override suspend fun getVehicleDetail(id: String): DomainResult<VehicleDetail> =
-                vehicleResult
-        },
+        vehicleRepository = vehicleRepository,
         routeRepository = object : RouteRepository {
             override suspend fun getRoutes(): DomainResult<List<Route>> = DomainResult.Empty
 
