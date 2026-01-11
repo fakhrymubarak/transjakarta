@@ -1,6 +1,7 @@
 package com.fakhry.transjakarta.feature.vehicles.data.repository
 
 import androidx.paging.testing.asSnapshot
+import com.fakhry.transjakarta.core.domain.DomainResult
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleAttributesDto
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleDataDto
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleResponse
@@ -9,6 +10,7 @@ import com.fakhry.transjakarta.feature.vehicles.data.remote.service.VehicleMbtaA
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleFilters
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class VehicleRepositoryImplTest {
@@ -51,6 +53,23 @@ class VehicleRepositoryImplTest {
             fakeApi.requests,
         )
     }
+
+    @Test
+    fun `getVehicleDetail loads vehicle from api`() = runTest {
+        val vehicleDto = createTestVehicles(1).first()
+        val response = VehicleResponse(data = vehicleDto)
+        val fakeApi = RecordingVehicleMbtaApiService(
+            response = VehiclesResponse(emptyList())
+        )
+        fakeApi.singleResponse = response
+
+        val repository = VehicleRepositoryImpl(fakeApi)
+        val result = repository.getVehicleDetail("v1")
+
+        assertTrue(result is DomainResult.Success)
+        val success = result as DomainResult.Success
+        assertEquals("v1", success.data.id)
+    }
 }
 
 private data class VehicleRequest(
@@ -64,6 +83,7 @@ private class RecordingVehicleMbtaApiService(
     private val response: VehiclesResponse,
 ) : VehicleMbtaApiService {
     val requests = mutableListOf<VehicleRequest>()
+    var singleResponse: VehicleResponse? = null
 
     override suspend fun getVehicles(
         filters: Map<String, String>,
@@ -83,7 +103,7 @@ private class RecordingVehicleMbtaApiService(
     }
 
     override suspend fun getVehicle(id: String, include: String, fields: String): VehicleResponse {
-        error("Not used in VehicleRepositoryImplTest")
+        return singleResponse ?: error("Not set")
     }
 }
 

@@ -3,6 +3,7 @@ package com.fakhry.transjakarta.feature.vehicles.data.repository
 import com.fakhry.transjakarta.core.domain.DomainResult
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RouteAttributesDto
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RouteDataDto
+import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RouteResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RoutesResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.RouteMbtaApiService
 import kotlinx.coroutines.test.runTest
@@ -54,11 +55,29 @@ class RouteRepositoryImplTest {
         assertEquals(listOf(0, pageSize), api.callsOffsets)
     }
 
+    @Test
+    fun `getRouteById returns mapped route`() = runTest {
+        val dto = RouteDataDto(
+            id = "r1",
+            attributes = RouteAttributesDto(shortName = "sn", longName = "ln")
+        )
+        val api = RecordingRouteService(mapOf())
+        api.singleResponse = RouteResponse(data = dto)
+
+        val repository = RouteRepositoryImpl(api)
+        val result = repository.getRouteById("r1")
+
+        val route = (result as DomainResult.Success).data
+        assertEquals("r1", route.id)
+        assertEquals("sn", route.shortName)
+    }
+
     private class RecordingRouteService(
         private val responses: Map<Int, RoutesResponse>,
     ) : RouteMbtaApiService {
         val callsOffsets = mutableListOf<Int>()
         val callsLimits = mutableListOf<Int>()
+        var singleResponse: RouteResponse? = null
 
         override suspend fun getRoutes(offset: Int, limit: Int, fields: String): RoutesResponse {
             callsOffsets += offset
@@ -66,6 +85,7 @@ class RouteRepositoryImplTest {
             return responses[offset] ?: RoutesResponse(emptyList())
         }
 
-        override suspend fun getRoute(id: String, fields: String) = error("not used in test")
+        override suspend fun getRoute(id: String, fields: String) =
+            singleResponse ?: error("not used in test")
     }
 }

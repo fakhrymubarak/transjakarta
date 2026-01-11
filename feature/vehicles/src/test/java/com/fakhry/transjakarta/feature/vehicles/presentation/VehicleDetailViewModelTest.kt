@@ -137,6 +137,99 @@ class VehicleDetailViewModelTest {
         vm.pollJob?.cancel()
     }
 
+    @Test
+    fun `polling updates ui after interval`() = scope.runTest {
+        val initialVehicle = createVehicleDetail("v1", 1.0, 1.0)
+        val updatedVehicle = createVehicleDetail("v1", 1.1, 1.1) // Moved slightly
+
+        val fakeRepo = FakeVehicleRepository()
+        fakeRepo.detailResult = DomainResult.Success(initialVehicle)
+
+        val useCase = buildUseCase(vehicleRepository = fakeRepo)
+        val vm = VehicleDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
+            getVehicleDetailWithRelations = useCase,
+            vehicleRepository = fakeRepo,
+        )
+
+        advanceTimeBy(1000)
+        val intialState = vm.uiState.value as UiState.Success
+        assertEquals(1.0, intialState.data.latitude)
+
+        // Update repo and wait for poll
+        fakeRepo.detailResult = DomainResult.Success(updatedVehicle)
+        advanceTimeBy(5000 + 100) // 5s interval
+
+        val updatedState = vm.uiState.value as UiState.Success
+        assertEquals(1.1, updatedState.data.latitude)
+
+        vm.pollJob?.cancel()
+    }
+
+    @Test
+    fun `retry reloads data`() = scope.runTest {
+        val fakeRepo = FakeVehicleRepository()
+        fakeRepo.detailResult = DomainResult.Error("Network error")
+
+        val useCase = buildUseCase(vehicleRepository = fakeRepo)
+        val vm = VehicleDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
+            getVehicleDetailWithRelations = useCase,
+            vehicleRepository = fakeRepo,
+        )
+
+        advanceTimeBy(1000)
+        assertTrue(vm.uiState.value is UiState.Error)
+
+        // Fix error and retry
+        fakeRepo.detailResult = DomainResult.Success(createVehicleDetail("v1", 1.0, 1.0))
+        vm.retry()
+
+        advanceTimeBy(1000)
+        assertTrue(vm.uiState.value is UiState.Success)
+
+        vm.pollJob?.cancel()
+    }
+
+    @Test
+    fun `empty result shows empty state`() = scope.runTest {
+        val fakeRepo = FakeVehicleRepository()
+        fakeRepo.detailResult = DomainResult.Empty
+
+        val useCase = buildUseCase(vehicleRepository = fakeRepo)
+        val vm = VehicleDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("vehicleId" to "v1")),
+            getVehicleDetailWithRelations = useCase,
+            vehicleRepository = fakeRepo,
+        )
+
+        advanceTimeBy(1000)
+        assertTrue(vm.uiState.value is UiState.Empty)
+
+        vm.pollJob?.cancel()
+    }
+
+    private fun createVehicleDetail(id: String, lat: Double, long: Double) = VehicleDetail(
+        id = id,
+        label = "Bus $id",
+        currentStatus = VehicleStatus.STOPPED_AT,
+        latitude = lat,
+        longitude = long,
+        updatedAt = "2024-01-01",
+        routeId = "route-1",
+        tripId = "trip-1",
+        stopId = "stop-1",
+    )
+
+    class FakeVehicleRepository : VehicleRepository {
+        var detailResult: DomainResult<VehicleDetail> = DomainResult.Empty
+
+        override fun getVehiclesPagingFlow(filters: VehicleFilters) = error("not used")
+
+        override suspend fun getVehicleDetail(id: String): DomainResult<VehicleDetail> =
+            detailResult
+    }
+
     private fun createVehicleRepository(
         vehicleResult: DomainResult<VehicleDetail>,
     ): VehicleRepository = object : VehicleRepository {

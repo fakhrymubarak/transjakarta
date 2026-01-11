@@ -1,6 +1,7 @@
 package com.fakhry.transjakarta.feature.vehicles.data.repository
 
 import androidx.paging.testing.asSnapshot
+import com.fakhry.transjakarta.core.domain.DomainResult
 import com.fakhry.transjakarta.feature.vehicles.data.paging.TripPagingSource
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripAttributesDto
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripDataDto
@@ -65,6 +66,22 @@ class TripRepositoryImplTest {
         assertEquals(TripPagingSource.PAGE_SIZE, call.limit)
     }
 
+    @Test
+    fun `getTripById returns trip`() = runTest(testDispatcher) {
+        val dto = TripDataDto(
+            id = "t1",
+            attributes = TripAttributesDto(name = "T1", headsign = "H1", blockId = "b1")
+        )
+        val api = RecordingTripService()
+        api.singleResponse = TripResponse(data = dto)
+
+        val repository = TripRepositoryImpl(api)
+        val result = repository.getTripById("t1")
+
+        assertTrue(result is DomainResult.Success)
+        assertEquals("t1", (result as DomainResult.Success).data.id)
+    }
+
     private class RecordingTripService(
         private val response: TripsResponse = TripsResponse(emptyList()),
     ) : TripMbtaApiService {
@@ -76,6 +93,7 @@ class TripRepositoryImplTest {
         )
 
         val calls = mutableListOf<Call>()
+        var singleResponse: TripResponse? = null
 
         override suspend fun getTrips(
             filters: Map<String, String>,
@@ -88,6 +106,6 @@ class TripRepositoryImplTest {
         }
 
         override suspend fun getTrip(id: String, fields: String): TripResponse =
-            error("not used in test")
+            singleResponse ?: error("not used in test")
     }
 }

@@ -159,6 +159,56 @@ class FilterViewModelTest {
     }
 
     @Test
+    fun `empty routes sets empty list and no error`() = runTest(testDispatcher) {
+        routeRepository = FakeRouteRepository(result = DomainResult.Empty)
+        val viewModel = FilterViewModel(routeRepository, tripRepository)
+
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.routes.isEmpty())
+        assertEquals(null, viewModel.uiState.value.routesError)
+    }
+
+    @Test
+    fun `network error shows friendly message`() = runTest(testDispatcher) {
+        routeRepository = FakeRouteRepository(
+            result = DomainResult.Error("Timeout", isNetworkError = true)
+        )
+        val viewModel = FilterViewModel(routeRepository, tripRepository)
+
+        advanceUntilIdle()
+
+        assertEquals(
+            "Network error. Check your connection and try again.",
+            viewModel.uiState.value.routesError,
+        )
+    }
+
+    @Test
+    fun `updateRouteSearchQuery updates state`() = runTest(testDispatcher) {
+        val viewModel = FilterViewModel(routeRepository, tripRepository)
+
+        viewModel.updateRouteSearchQuery("query")
+
+        assertEquals("query", viewModel.uiState.value.routeSearchQuery)
+    }
+
+    @Test
+    fun `exception in loadRoutes handled safely`() = runTest(testDispatcher) {
+        val throwingRepo = object : RouteRepository {
+            override suspend fun getRoutes(): DomainResult<List<Route>> =
+                throw RuntimeException("Crash")
+
+            override suspend fun getRouteById(id: String) = DomainResult.Empty
+        }
+        val viewModel = FilterViewModel(throwingRepo, tripRepository)
+
+        advanceUntilIdle()
+
+        assertEquals("Crash", viewModel.uiState.value.routesError)
+    }
+
+    @Test
     fun `trips paging uses selected routes and search query`() = runTest(testDispatcher) {
         val recordingTripRepository = RecordingTripRepository()
         val viewModel = FilterViewModel(routeRepository, recordingTripRepository)
