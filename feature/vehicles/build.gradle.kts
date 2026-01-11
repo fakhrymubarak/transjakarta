@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":core:utils"))
+
     // Paging
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)

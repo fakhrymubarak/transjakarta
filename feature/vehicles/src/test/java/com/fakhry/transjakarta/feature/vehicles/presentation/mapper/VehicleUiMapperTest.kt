@@ -56,7 +56,7 @@ class VehicleUiMapperTest {
 
         val ui = vehicle.toUiModel()
 
-        assertEquals("Jan 01, 15:45:30", ui.updatedAtLabel)
+        assertEquals("Jan 01, 08:45:30", ui.updatedAtLabel)
     }
 
     @Test

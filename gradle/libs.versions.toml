@@ -27,6 +27,7 @@ mockitoKotlin = "6.1.0"
 junitJunit = "4.13.2"
 appcompat = "1.7.1"
 material = "1.13.0"
+annotationJvm = "1.9.1"
 
 [libraries]
 android-gradle = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -74,6 +75,7 @@ mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", versio
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-annotation-jvm = { group = "androidx.annotation", name = "annotation-jvm", version.ref = "annotationJvm" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

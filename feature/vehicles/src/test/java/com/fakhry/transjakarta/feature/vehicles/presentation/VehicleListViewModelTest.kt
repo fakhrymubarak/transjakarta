@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.Locale
+import java.util.TimeZone
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class VehicleListViewModelTest {
@@ -31,11 +32,14 @@ class VehicleListViewModelTest {
     private lateinit var viewModel: VehicleListViewModel
     private lateinit var repository: VehicleRepository
     private lateinit var previousLocale: Locale
+    private lateinit var previousTimeZone: TimeZone
 
     @BeforeEach
     fun setup() {
         previousLocale = Locale.getDefault()
+        previousTimeZone = TimeZone.getDefault()
         Locale.setDefault(Locale.US)
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
         Dispatchers.setMain(testDispatcher)
         repository = FakeVehicleRepository(createVehicles())
         viewModel = VehicleListViewModel(repository)
@@ -45,6 +49,7 @@ class VehicleListViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
         Locale.setDefault(previousLocale)
+        TimeZone.setDefault(previousTimeZone)
     }
 
     @Test
@@ -62,7 +67,7 @@ class VehicleListViewModelTest {
         assertEquals(VehicleStatus.IN_TRANSIT_TO, item.currentStatus)
         assertEquals("In Transit", item.statusLabel)
         assertEquals("10.123456, 20.654321", item.coordinatesLabel)
-        assertEquals("Jan 15, 14:30:00", item.updatedAtLabel)
+        assertEquals("Jan 15, 19:30:00", item.updatedAtLabel)
     }
 
     @Test
