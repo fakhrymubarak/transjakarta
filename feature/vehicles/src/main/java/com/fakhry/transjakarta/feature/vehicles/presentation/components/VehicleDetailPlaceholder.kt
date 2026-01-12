@@ -35,7 +35,6 @@ fun VehicleDetailPlaceholder(modifier: Modifier = Modifier) {
             .shimmer(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
 
         // Header Section
         Column(

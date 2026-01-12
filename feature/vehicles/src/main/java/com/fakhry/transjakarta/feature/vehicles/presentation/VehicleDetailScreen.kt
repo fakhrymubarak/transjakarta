@@ -166,7 +166,6 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
         // Header Section
         Column(
             modifier = Modifier.fillMaxWidth(),

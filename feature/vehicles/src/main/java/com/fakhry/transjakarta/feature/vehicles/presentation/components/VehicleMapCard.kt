@@ -19,8 +19,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInteropFilter
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -110,7 +110,7 @@ fun VehicleMapCard(
                     anchor = Offset(0.5f, 0.5f),
                 ) {
                     Canvas(modifier = Modifier.size(32.dp)) {
-                        val path = androidx.compose.ui.graphics.Path().apply {
+                        val path = Path().apply {
                             moveTo(size.width / 2f, 0f) // Top center
                             lineTo(size.width, size.height) // Bottom right
                             lineTo(size.width / 2f, size.height * 0.7f) // Bottom center indent (arrow shape)

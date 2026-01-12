@@ -1,5 +1,6 @@
 package com.fakhry.transjakarta.feature.vehicles.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,9 +41,11 @@ fun RouteFilterSheet(
     modifier: Modifier = Modifier,
 ) {
     val filteredRoutes = state.routes
+    val sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
         modifier = modifier,
+        sheetState = sheetState,
         onDismissRequest = onDismissRequest,
     ) {
         Row(
@@ -55,7 +58,7 @@ fun RouteFilterSheet(
             TextButton(onClick = onClear) { Text(text = "Clear") }
             Text(
                 text = "Route Filters",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f),
             )
@@ -137,20 +140,28 @@ fun RouteFilterSheet(
 }
 
 @Composable
-internal fun FilterOptionRow(option: FilterOptionUiModel, selected: Boolean, onToggle: () -> Unit) {
+internal fun FilterOptionRow(
+    option: FilterOptionUiModel,
+    selected: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .clickable(onClick = onToggle)
+            .padding(vertical = 12.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         androidx.compose.material3.Checkbox(
             checked = selected,
-            onCheckedChange = { onToggle() },
+            onCheckedChange = null // Handled by Row click
         )
         Text(
             text = option.label,
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
