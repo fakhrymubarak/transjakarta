@@ -1,38 +1,92 @@
-# Transjakarta Android Fleet App
+# 🚌 Transjakarta Fleet Tracker
 
-A native Android application that consumes the MBTA v3 API to list, filter, and inspect public transit vehicles with live mapping. The app targets Android API 24+ and uses Kotlin, Jetpack Compose, and MVVM with Retrofit + OkHttp and Kotlinx Serialization.
+![CI](https://github.com/fakhry/transjakarta/actions/workflows/ci.yaml/badge.svg)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg?style=flat&logo=kotlin)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Material3-blue.svg?style=flat&logo=android)
+![Android](https://img.shields.io/badge/Android-SDK%2024%2B-green.svg?style=flat&logo=android)
+![Coverage](https://raw.githubusercontent.com/fakhry/transjakarta/badges/jacoco.svg)
 
-## Data Source
-- Primary API: MBTA v3 (Swagger: `docs/api/swagger.json`)
-- Key endpoints: `/vehicles` (listing), `/routes`, `/trips`, `/stops`, `/vehicles/{id}`
-- Optional API key for higher rate limits: send via `x-api-key` header or `api_key` query param.
+A modern, native Android application built to track the Transjakarta fleet in real-time. Experience seamless navigation, powerful filtering, and live vehicle tracking, all powered by the robust MBTA v3 API.
 
-## Prerequisites
-- Android Studio (Giraffe or newer) with bundled JDK 17
-- Android SDK 24+
-- Google Maps API key stored locally (never committed)
+<video src="docs/assets/showcase.webm" width="300" controls></video>
 
-## Setup
-1) Configure secrets in `secret.properties` (create if absent):
+## ✨ Key Features
+
+*   **📍 Live Vehicle Tracking**: Visualize vehicles on an interactive map with real-time bearing and route polylines.
+*   **🔍 Powerful Filtering**: Filter vehicles by **Route** and **Trip** with sticky headers and instant search.
+*   **📄 Smart Pagination**: Infinite scrolling with efficient data loading and pull-to-refresh support.
+*   **🎨 Modern UI**: Built 100% with **Jetpack Compose** and **Material 3**, featuring smooth animations and a premium look.
+*   **🛣️ detailed Insights**: View vehicle status, upcoming stops, and "From -> To" route directions at a glance.
+
+## 🛠️ Tech Stack
+
+Built with modern Android development best practices:
+
+*   **Language**: [Kotlin](https://kotlinlang.org/)
+*   **UI Toolkit**: [Jetpack Compose](https://developer.android.com/jetpack/compose) (Material 3)
+*   **Architecture**: MVVM + Clean Architecture (Domain, Data, Presentation layers)
+*   **Dependency Injection**: [Hilt](https://dagger.dev/hilt/)
+*   **Networking**: [Retrofit](https://square.github.io/retrofit/) + [OkHttp](https://square.github.io/okhttp/)
+*   **Serialization**: [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization)
+*   **Maps**: [Google Maps Compose](https://github.com/googlemaps/android-maps-compose)
+*   **Pagination**: [Paging 3](https://developer.android.com/topic/libraries/architecture/paging/v3)
+*   **Testing**: JUnit 5, Mockito, Coroutines Test
+*   **Quality**: Ktlint, Kover (Coverage)
+
+## 🚀 Setup & Installation
+
+### Prerequisites
+*   Android Studio Giraffe or newer (JDK 17 bundled)
+*   Android SDK 24+
+*   Google Maps API Key
+*   MBTA API Key
+
+### Configuration
+1.  Create a `secret.properties` file in the root directory:
+    ```properties
+    MBTA_API_KEY=your_mbta_api_key_here    # Get one: https://api-v3.mbta.com/portal
+    GOOGLE_MAPS_API_KEY=your_maps_key_here # Get one: https://developers.google.com/maps/documentation/android-sdk/get-api-key
+    ```
+2.  Sync the project with Gradle.
+
+### Build & Run
+*   **Debug APK**: `./gradlew :app:assembleDebug`
+*   **Install**: `./gradlew :app:installDebug`
+*   **Run Tests**: `./gradlew :feature:vehicles:testDebugUnitTest`
+
+## 🧪 Quality Assurance
+
+This project maintains high code quality standards efficiently:
+
+*   **CI/CD**: GitHub Actions pipeline runs Lint, Unit Tests, and Coverage checks on every push to `main`.
+*   **Linting**: Enforced via `ktlint` to ensure consistent code style.
+*   **Commands**:
+    *   Run all checks: `./gradlew ktlintCheck lint testDebugUnitTest koverVerify`
+
+## 📂 Project Structure
+
+```text
+├── app/                      # Android app module
+├── build-logic/              # Custom Gradle plugins and conventions
+├── core/
+│   ├── designsystem/         # :core:designsystem (UI components, theme)
+│   ├── domain/               # :core:domain (Use cases, models)
+│   ├── networking/           # :core:networking (Retrofit, OkHttp)
+│   └── utils/                # :core:utils (Extensions, helpers)
+├── feature/
+│   └── vehicles/             # :feature:vehicles
+│       ├── data/             # Repository impl, Data sources, Mappers
+│       ├── di/               # Dependency Injection (Hilt modules)
+│       ├── domain/           # Use cases, Repository interfaces, Entities
+│       └── presentation/     # UI (Composables), ViewModels, State
+├── docs/
+│   ├── adrs/                 # Architecture Decision Records
+│   ├── api/                  # API Specifications (Swagger)
+│   └── features/             # Feature documentation
+├── build.gradle.kts          # Root build file
+├── settings.gradle.kts       # Project settings
+└── gradle.properties         # Project properties
 ```
-MBTA_API_KEY=your_api_key_here    # optional but recommended for rate limits
-GOOGLE_MAPS_API_KEY=your_maps_key # required for map screens
-```
-2) Sync the project in Android Studio or from the CLI.
 
-## Build & Run
-- Build debug APK: `./gradlew :app:assembleDebug`
-- Install on a connected device/emulator: `./gradlew :app:installDebug`
-- Run tests for the vehicles feature: `./gradlew :feature:vehicles:testDebugUnitTest`
-- Code style and coverage gates are applied via ktlint/kover in the build logic; CI runs on pushes/PRs to `master`.
-
-## Project Layout
-- `app/` — application entry point, navigation, and wiring
-- `core/` — shared modules (`domain`, `networking`, `designsystem`)
-- `feature/vehicles/` — vehicle list, filters, details, and map tracking flows
-- `build-logic/` — custom Gradle plugins (ktlint, kover, Android defaults)
-- `docs/` — requirements, ADRs, and API reference (`docs/api/swagger.json`)
-
-## Notes
-- Google Maps key must be injected via secrets; do not hardcode.
-- Rate limiting is handled per MBTA guidelines; user-friendly messages surface when limits are hit.
+---
+*Built with ❤️ by Fakhry*

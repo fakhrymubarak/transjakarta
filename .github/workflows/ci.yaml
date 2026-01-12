@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,4 +31,10 @@ jobs:
           cache-read-only: false
 
       - name: Run Checks
-        run: ./gradlew ktlintCheck lint testDebugUnitTest koverVerify
+        run: ./gradlew ktlintCheck lint testDebugUnitTest koverVerify koverXmlReportDebug
+
+      - name: Generate Coverage Badge
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          generate-coverage-badge: true
+          jacoco-csv-file: "**/build/reports/kover/reportDebug.xml"
