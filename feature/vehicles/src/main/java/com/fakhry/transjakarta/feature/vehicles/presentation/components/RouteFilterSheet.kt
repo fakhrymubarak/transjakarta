@@ -95,6 +95,7 @@ fun RouteFilterSheet(
                         }
                     }
                 }
+
                 state.routesError != null -> {
                     item {
                         Column(modifier = Modifier.fillMaxWidth()) {
@@ -109,6 +110,7 @@ fun RouteFilterSheet(
                         }
                     }
                 }
+
                 filteredRoutes.isEmpty() -> {
                     item {
                         Text(
@@ -117,6 +119,7 @@ fun RouteFilterSheet(
                         )
                     }
                 }
+
                 else -> {
                     items(filteredRoutes) { route ->
                         FilterOptionRow(
