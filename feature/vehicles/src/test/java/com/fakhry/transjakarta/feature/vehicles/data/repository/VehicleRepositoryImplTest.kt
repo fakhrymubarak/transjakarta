@@ -8,17 +8,24 @@ import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleResp
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehiclesResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.VehicleMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.domain.model.VehicleFilters
+import com.fakhry.transjakarta.utils.coroutines.DispatcherProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class VehicleRepositoryImplTest {
+
+    private val testDispatchers = DispatcherProvider(UnconfinedTestDispatcher())
+
     @Test
     fun `getVehiclesPagingFlow loads first page from api`() = runTest {
         val response = VehiclesResponse(data = createTestVehicles(10))
         val fakeApi = RecordingVehicleMbtaApiService(response)
-        val repository = VehicleRepositoryImpl(fakeApi)
+        val repository = VehicleRepositoryImpl(fakeApi, testDispatchers)
 
         val snapshot = repository.getVehiclesPagingFlow(
             VehicleFilters(
@@ -63,7 +70,7 @@ class VehicleRepositoryImplTest {
         )
         fakeApi.singleResponse = response
 
-        val repository = VehicleRepositoryImpl(fakeApi)
+        val repository = VehicleRepositoryImpl(fakeApi, testDispatchers)
         val result = repository.getVehicleDetail("v1")
 
         assertTrue(result is DomainResult.Success)

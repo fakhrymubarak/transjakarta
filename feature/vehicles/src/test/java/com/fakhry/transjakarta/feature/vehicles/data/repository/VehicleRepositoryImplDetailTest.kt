@@ -5,13 +5,19 @@ import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleAttr
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleDataDto
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.VehicleResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.VehicleMbtaApiService
+import com.fakhry.transjakarta.utils.coroutines.DispatcherProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.IOException
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class VehicleRepositoryImplDetailTest {
+
+    private val testDispatchers = DispatcherProvider(UnconfinedTestDispatcher())
 
     @Test
     fun `getVehicleDetail returns mapped success`() = runTest {
@@ -29,7 +35,7 @@ class VehicleRepositoryImplDetailTest {
                 ),
             ),
         )
-        val repository = VehicleRepositoryImpl(api)
+        val repository = VehicleRepositoryImpl(api, testDispatchers)
 
         val result = repository.getVehicleDetail("v1")
 
@@ -53,7 +59,7 @@ class VehicleRepositoryImplDetailTest {
             override suspend fun getVehicle(id: String, include: String, fields: String) =
                 throw IOException("boom")
         }
-        val repository = VehicleRepositoryImpl(api)
+        val repository = VehicleRepositoryImpl(api, testDispatchers)
 
         val result = repository.getVehicleDetail("v1")
 

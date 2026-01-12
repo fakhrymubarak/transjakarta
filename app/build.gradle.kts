@@ -63,6 +63,7 @@ hilt {
 dependencies {
     implementation(project(":core:networking"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:utils"))
     implementation(project(":feature:vehicles"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

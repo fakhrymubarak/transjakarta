@@ -5,12 +5,18 @@ import com.fakhry.transjakarta.feature.vehicles.data.remote.response.StopAttribu
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.StopDataDto
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.StopResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.StopMbtaApiService
+import com.fakhry.transjakarta.utils.coroutines.DispatcherProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StopRepositoryImplTest {
+
+    private val testDispatchers = DispatcherProvider(UnconfinedTestDispatcher())
 
     @Test
     fun `getStop returns mapped stop on success`() = runTest {
@@ -28,7 +34,7 @@ class StopRepositoryImplTest {
                 ),
             )
         }
-        val repository = StopRepositoryImpl(fakeApi)
+        val repository = StopRepositoryImpl(fakeApi, testDispatchers)
 
         val result = repository.getStop("s1")
 
@@ -48,7 +54,7 @@ class StopRepositoryImplTest {
             override suspend fun getStop(id: String, fields: String): StopResponse =
                 throw RuntimeException("API Error")
         }
-        val repository = StopRepositoryImpl(fakeApi)
+        val repository = StopRepositoryImpl(fakeApi, testDispatchers)
 
         val result = repository.getStop("s1")
 

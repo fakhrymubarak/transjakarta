@@ -6,12 +6,18 @@ import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RouteDataDt
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RouteResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.RoutesResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.RouteMbtaApiService
+import com.fakhry.transjakarta.utils.coroutines.DispatcherProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RouteRepositoryImplTest {
+
+    private val testDispatchers = DispatcherProvider(UnconfinedTestDispatcher())
 
     @Test
     fun `fetches all pages sorts by short name and caches`() = runTest {
@@ -34,7 +40,7 @@ class RouteRepositoryImplTest {
                 pageSize to RoutesResponse(secondPage),
             ),
         )
-        val repository = RouteRepositoryImpl(api)
+        val repository = RouteRepositoryImpl(api, testDispatchers)
 
         val result = repository.getRoutes()
         val routes = (result as DomainResult.Success).data
@@ -64,7 +70,7 @@ class RouteRepositoryImplTest {
         val api = RecordingRouteService(mapOf())
         api.singleResponse = RouteResponse(data = dto)
 
-        val repository = RouteRepositoryImpl(api)
+        val repository = RouteRepositoryImpl(api, testDispatchers)
         val result = repository.getRouteById("r1")
 
         val route = (result as DomainResult.Success).data

@@ -7,18 +7,21 @@ import com.fakhry.transjakarta.feature.vehicles.data.mapper.toRoutes
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.RouteMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.domain.model.Route
 import com.fakhry.transjakarta.feature.vehicles.domain.repository.RouteRepository
+import com.fakhry.transjakarta.utils.coroutines.DispatcherProvider
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import javax.inject.Inject
 
 class RouteRepositoryImpl @Inject constructor(
     private val api: RouteMbtaApiService,
+    private val dispatchers: DispatcherProvider,
 ) : RouteRepository {
     private var cachedRoutes: List<Route>? = null
 
-    override suspend fun getRoutes(): DomainResult<List<Route>> {
-        cachedRoutes?.let { return DomainResult.Success(it) }
+    override suspend fun getRoutes(): DomainResult<List<Route>> = withContext(dispatchers.io) {
+        cachedRoutes?.let { return@withContext DomainResult.Success(it) }
 
-        return runCatching {
+        runCatching {
             val routes = mutableListOf<Route>()
             var offset = 0
             while (true) {
@@ -51,10 +54,10 @@ class RouteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRouteById(id: String): DomainResult<Route> {
-        cachedRoutes?.firstOrNull { it.id == id }?.let { return DomainResult.Success(it) }
+    override suspend fun getRouteById(id: String): DomainResult<Route> = withContext(dispatchers.io) {
+        cachedRoutes?.firstOrNull { it.id == id }?.let { return@withContext DomainResult.Success(it) }
 
-        return mapNetworkCall { api.getRoute(id).data.toRoute() }
+        mapNetworkCall { api.getRoute(id).data.toRoute() }
     }
 
     companion object {

@@ -9,6 +9,7 @@ import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripRespons
 import com.fakhry.transjakarta.feature.vehicles.data.remote.response.TripsResponse
 import com.fakhry.transjakarta.feature.vehicles.data.remote.service.TripMbtaApiService
 import com.fakhry.transjakarta.feature.vehicles.domain.model.TripFilters
+import com.fakhry.transjakarta.utils.coroutines.DispatcherProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -19,12 +20,13 @@ import org.junit.jupiter.api.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class TripRepositoryImplTest {
     private val testDispatcher = StandardTestDispatcher()
+    private val testDispatchers = DispatcherProvider(testDispatcher)
 
     @Test
     fun `empty filters returns empty paging data and does not call api`() =
         runTest(testDispatcher) {
             val api = RecordingTripService()
-            val repository = TripRepositoryImpl(api)
+            val repository = TripRepositoryImpl(api, testDispatchers)
 
             val items = repository.getTripsPagingFlow(TripFilters()).asSnapshot()
 
@@ -48,7 +50,7 @@ class TripRepositoryImplTest {
                 ),
             ),
         )
-        val repository = TripRepositoryImpl(api)
+        val repository = TripRepositoryImpl(api, testDispatchers)
 
         val filters = TripFilters(routeIds = setOf("route-1"))
         val items = repository.getTripsPagingFlow(filters).asSnapshot()
@@ -75,7 +77,7 @@ class TripRepositoryImplTest {
         val api = RecordingTripService()
         api.singleResponse = TripResponse(data = dto)
 
-        val repository = TripRepositoryImpl(api)
+        val repository = TripRepositoryImpl(api, testDispatchers)
         val result = repository.getTripById("t1")
 
         assertTrue(result is DomainResult.Success)

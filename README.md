@@ -1,6 +1,6 @@
 # 🚌 Transjakarta Fleet Tracker
 
-![CI](https://github.com/fakhry/transjakarta/actions/workflows/ci.yaml/badge.svg)
+[![CI](https://github.com/fakhrymubarak/transjakarta/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/fakhrymubarak/transjakarta/actions/workflows/ci.yaml)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg?style=flat&logo=kotlin)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Material3-blue.svg?style=flat&logo=android)
 ![Android](https://img.shields.io/badge/Android-SDK%2024%2B-green.svg?style=flat&logo=android)
