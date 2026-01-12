@@ -8,7 +8,7 @@
 
 A modern, native Android application built to track the Transjakarta fleet in real-time. Experience seamless navigation, powerful filtering, and live vehicle tracking, all powered by the robust MBTA v3 API.
 
-<video src="docs/assets/showcase.webm" width="300" controls></video>
+<video src="https://github.com/fakhrymubarak/transjakarta/raw/refs/heads/main/docs/assets/showcase.webm" width="300" controls></video>
 
 ## ✨ Key Features
 
