@@ -34,7 +34,8 @@ jobs:
         run: ./gradlew ktlintCheck lint testDebugUnitTest koverVerify koverXmlReportDebug
 
       - name: Generate Coverage Badge
+        continue-on-error: true
         uses: cicirello/jacoco-badge-generator@v2
         with:
           generate-coverage-badge: true
-          jacoco-csv-file: "**/build/reports/kover/reportDebug.xml"
+          jacoco-csv-file: "feature/vehicles/build/reports/kover/reportDebug.xml"
