@@ -31,11 +31,91 @@ jobs:
           cache-read-only: false
 
       - name: Run Checks
-        run: ./gradlew ktlintCheck lint testDebugUnitTest koverVerify koverXmlReportDebug
+        run: ./gradlew ktlintCheck lint testDebugUnitTest koverVerify koverXmlReport
 
-      - name: Generate Coverage Badge
+      - name: Calculate Total Coverage (Multi-Module)
         continue-on-error: true
-        uses: cicirello/jacoco-badge-generator@v2
+        id: calc_coverage
+        run: |
+          echo "
+          import glob
+          import os
+          import xml.etree.ElementTree as ET
+          import sys
+
+          total_covered = 0
+          total_missed = 0
+          
+          # 1. Find all reports recursively
+          # We use the path you confirmed: build/reports/kover/report.xml
+          report_pattern = '**/build/reports/kover/report.xml'
+          reports = glob.glob(report_pattern, recursive=True)
+
+          print(f'Found {len(reports)} coverage reports.')
+          print('-' * 40)
+          print(f'{'Module':<40} | {'Cov %':<6}')
+          print('-' * 40)
+
+          for report in reports:
+              try:
+                  tree = ET.parse(report)
+                  root = tree.getroot()
+          
+                  # Get module name from path (e.g., 'core/network/build/...' -> 'core/network')
+                  module_name = report.split('/build/')[0]
+          
+                  # 2. Find the top-level INSTRUCTION counter for this module
+                  module_covered = 0
+                  module_missed = 0
+          
+                  for child in root:
+                      if child.tag == 'counter' and child.attrib.get('type') == 'INSTRUCTION':
+                          module_covered = int(child.attrib.get('covered', 0))
+                          module_missed = int(child.attrib.get('missed', 0))
+                          break 
+
+                  # Add to global totals
+                  total_covered += module_covered
+                  total_missed += module_missed
+          
+                  # Calculate module specific % for the log
+                  if (module_covered + module_missed) > 0:
+                      mod_pct = int((module_covered / (module_covered + module_missed)) * 100)
+                  else:
+                      mod_pct = 0
+          
+                  print(f'{module_name:<40} | {mod_pct}%')
+
+              except Exception as e:
+                  print(f'Error parsing {report}: {e}')
+
+          print('-' * 40)
+
+          # 3. Calculate Global Percentage
+          if (total_covered + total_missed) > 0:
+              global_percentage = int((total_covered / (total_covered + total_missed)) * 100)
+          else:
+              global_percentage = 0
+          
+          print(f'GLOBAL COVERAGE: {global_percentage}%')
+
+          # 4. Write to GitHub Output
+          with open(sys.argv[1], 'a') as f:
+              f.write(f'COVERAGE={global_percentage}\n')
+          " > parse_coverage.py
+
+          python3 parse_coverage.py "$GITHUB_OUTPUT"
+
+
+      - name: Update Dynamic Badge
+        continue-on-error: true
+        uses: schneegans/dynamic-badges-action@v1.7.0
         with:
-          generate-coverage-badge: true
-          jacoco-csv-file: "feature/vehicles/build/reports/kover/reportDebug.xml"
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: ef8d5550c463be55913f8799450a0a3b
+          filename: kover-badge-transjakarta.json
+          label: coverage
+          message: ${{ steps.calc_coverage.outputs.COVERAGE }}%
+          valColorRange: ${{ steps.calc_coverage.outputs.COVERAGE }}
+          maxColorRange: 100
+          minColorRange: 0

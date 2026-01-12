@@ -4,7 +4,7 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-purple.svg?style=flat&logo=kotlin)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Material3-blue.svg?style=flat&logo=android)
 ![Android](https://img.shields.io/badge/Android-SDK%2024%2B-green.svg?style=flat&logo=android)
-![Coverage](https://raw.githubusercontent.com/fakhry/transjakarta/badges/jacoco.svg)
+![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/fakhrymubarak/ef8d5550c463be55913f8799450a0a3b/raw/kover-badge-transjakarta.json)
 
 A modern, native Android application built to track the Transjakarta fleet in real-time. Experience seamless navigation, powerful filtering, and live vehicle tracking, all powered by the robust MBTA v3 API.
 
