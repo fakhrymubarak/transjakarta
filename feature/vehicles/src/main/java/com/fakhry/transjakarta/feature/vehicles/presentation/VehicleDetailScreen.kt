@@ -212,11 +212,53 @@ private fun SuccessState(modifier: Modifier, vehicle: VehicleDetailUiModel) {
             title = "Route",
             icon = Icons.AutoMirrored.Filled.AltRoute,
             content = {
-                Text(
-                    text = vehicle.routeLabel,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (vehicle.routeShortName.isNotEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                                        shape = RoundedCornerShape(8.dp),
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                            ) {
+                                Text(
+                                    text = vehicle.routeShortName,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                        }
+
+                        Text(
+                            text = vehicle.routeLongName.ifBlank { vehicle.routeLabel },
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+
+                    if (vehicle.routeDirection.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Signpost,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.outline,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = vehicle.routeDirection,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.outline,
+                            )
+                        }
+                    }
+                }
             },
         )
 

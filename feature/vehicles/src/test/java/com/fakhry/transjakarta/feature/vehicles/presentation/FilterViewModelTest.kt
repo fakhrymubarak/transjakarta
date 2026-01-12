@@ -194,6 +194,26 @@ class FilterViewModelTest {
     }
 
     @Test
+    fun `updateRouteSearchQuery filters routes list`() = runTest(testDispatcher) {
+        val viewModel = FilterViewModel(routeRepository, tripRepository)
+        advanceUntilIdle()
+
+        viewModel.updateRouteSearchQuery("1")
+
+        assertEquals(1, viewModel.uiState.value.routes.size)
+        assertEquals("route-1", viewModel.uiState.value.routes.first().id)
+
+        viewModel.updateRouteSearchQuery("2")
+
+        assertEquals(1, viewModel.uiState.value.routes.size)
+        assertEquals("route-2", viewModel.uiState.value.routes.first().id)
+
+        viewModel.updateRouteSearchQuery("")
+
+        assertEquals(2, viewModel.uiState.value.routes.size)
+    }
+
+    @Test
     fun `exception in loadRoutes handled safely`() = runTest(testDispatcher) {
         val throwingRepo = object : RouteRepository {
             override suspend fun getRoutes(): DomainResult<List<Route>> =

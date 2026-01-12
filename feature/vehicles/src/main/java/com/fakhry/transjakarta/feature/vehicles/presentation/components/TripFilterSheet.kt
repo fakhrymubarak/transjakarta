@@ -47,46 +47,43 @@ fun TripFilterSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TextButton(onClick = onClear) { Text(text = "Clear") }
+            Text(
+                text = "Trip Filters",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f),
+            )
+            FilledTonalButton(onClick = onApply) { Text(text = "Apply") }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = state.tripSearchQuery,
+            onValueChange = onTripSearchChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            label = { Text(text = "Search trips") },
+            singleLine = true,
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TextButton(onClick = onClear) { Text(text = "Clear") }
-                    Text(
-                        text = "Trip Filters",
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f),
-                    )
-                    FilledTonalButton(onClick = onApply) { Text(text = "Apply") }
-                }
-            }
-
-            item {
-                Text(
-                    text = "Trips",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-
-            item {
-                OutlinedTextField(
-                    value = state.tripSearchQuery,
-                    onValueChange = onTripSearchChange,
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(text = "Search trips") },
-                    singleLine = true,
-                )
-            }
-
             val needsFilter = state.selectedRouteIds.isEmpty() && state.tripSearchQuery.isBlank()
 
             if (needsFilter) {

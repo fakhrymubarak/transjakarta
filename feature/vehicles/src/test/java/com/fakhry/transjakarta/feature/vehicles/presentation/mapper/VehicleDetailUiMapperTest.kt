@@ -31,6 +31,8 @@ class VehicleDetailUiMapperTest {
         assertEquals("v1", ui.id)
         assertEquals("Bus 1", ui.label)
         assertEquals("10 - Main Route", ui.routeLabel)
+        assertEquals("10", ui.routeShortName)
+        assertEquals("Main Route", ui.routeLongName)
         assertEquals("Morning Trip", ui.tripLabel) // Headsign preferred
         assertEquals("Central Station", ui.stopLabel)
     }

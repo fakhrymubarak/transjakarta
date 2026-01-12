@@ -46,6 +46,9 @@ fun VehicleDetailWithRelations.toUiModel(): VehicleDetailUiModel {
         }
     }
 
+    val routeShortName = this.route?.shortName.orEmpty()
+    val routeLongName = this.route?.longName.orEmpty()
+
     val routeLabel = this.route?.let { route ->
         listOfNotNull(
             route.shortName.takeUnless { it.isBlank() },
@@ -66,6 +69,8 @@ fun VehicleDetailWithRelations.toUiModel(): VehicleDetailUiModel {
         statusLabel = formatStatus(vehicle.currentStatus),
         updatedAtLabel = DateUtils.formatUpdatedAt(vehicle.updatedAt),
         routeDirection = routeDirection.orEmpty(),
+        routeShortName = routeShortName,
+        routeLongName = routeLongName,
         routeLabel = routeLabel.ifBlank { "Unknown Route" },
         tripLabel = tripLabel.ifBlank { "Unknown Trip" },
         stopLabel = stopLabel.ifBlank { "Unknown Stop" },

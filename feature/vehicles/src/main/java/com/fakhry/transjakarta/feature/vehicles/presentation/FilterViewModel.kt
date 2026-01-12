@@ -38,6 +38,8 @@ class FilterViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(VehicleFilterUiState(isRoutesLoading = true))
     val uiState: StateFlow<VehicleFilterUiState> = _uiState.asStateFlow()
 
+    private var allRoutes: List<FilterOptionUiModel> = emptyList()
+
     private val _appliedFilters = MutableStateFlow(VehicleFilters())
     val appliedFilters: StateFlow<VehicleFilters> = _appliedFilters.asStateFlow()
 
@@ -92,6 +94,7 @@ class FilterViewModel @Inject constructor(
 
     fun updateRouteSearchQuery(query: String) {
         _uiState.update { it.copy(routeSearchQuery = query) }
+        updateFilteredRoutes()
     }
 
     fun updateTripSearchQuery(query: String) {
@@ -129,23 +132,12 @@ class FilterViewModel @Inject constructor(
             try {
                 when (val result = routeRepository.getRoutes()) {
                     is DomainResult.Success -> {
-                        val routes = result.data.map { it.toFilterOptionUiModel() }
-                        _uiState.update { state ->
-                            state.copy(
-                                routes = routes,
-                                isRoutesLoading = false,
-                                routesError = null,
-                            )
-                        }
+                        allRoutes = result.data.map { it.toFilterOptionUiModel() }
+                        updateFilteredRoutes()
                     }
                     is DomainResult.Empty -> {
-                        _uiState.update { state ->
-                            state.copy(
-                                routes = emptyList(),
-                                isRoutesLoading = false,
-                                routesError = null,
-                            )
-                        }
+                        allRoutes = emptyList()
+                        updateFilteredRoutes()
                     }
                     is DomainResult.Error -> {
                         val message = result.message.ifBlank { "Failed to load routes" }
@@ -175,6 +167,24 @@ class FilterViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun updateFilteredRoutes() {
+        val query = _uiState.value.routeSearchQuery
+        val filtered = if (query.isBlank()) {
+            allRoutes
+        } else {
+            allRoutes.filter {
+                it.label.contains(query, ignoreCase = true)
+            }
+        }
+        _uiState.update {
+            it.copy(
+                routes = filtered,
+                isRoutesLoading = false,
+                routesError = null,
+            )
         }
     }
 

@@ -9,6 +9,8 @@ data class VehicleDetailUiModel(
     val statusLabel: String,
     val updatedAtLabel: String,
     val routeDirection: String,
+    val routeShortName: String,
+    val routeLongName: String,
     val routeLabel: String,
     val tripLabel: String,
     val stopLabel: String,
