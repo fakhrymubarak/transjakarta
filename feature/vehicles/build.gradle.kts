@@ -19,4 +19,8 @@ dependencies {
     testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.kotlin)
+
+    // Timber
+    implementation(libs.timber)
+
 }

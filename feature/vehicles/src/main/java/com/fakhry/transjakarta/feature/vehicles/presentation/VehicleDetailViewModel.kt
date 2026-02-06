@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,6 +38,7 @@ class VehicleDetailViewModel @Inject constructor(
 
     init {
         loadDetail()
+        Timber.e("Initialized VewModel")
     }
 
     fun retry() {
@@ -50,9 +52,11 @@ class VehicleDetailViewModel @Inject constructor(
             when (val result = getVehicleDetailWithRelations(vehicleId)) {
                 is DomainResult.Success -> {
                     currentDetail = result.data
+                    Timber.e("loadDetail viewModel $currentDetail")
                     _uiState.value = UiState.Success(result.data.toUiModel())
                     startPolling()
                 }
+
                 is DomainResult.Error -> {
                     _uiState.value =
                         UiState.Error(
