@@ -95,7 +95,7 @@ fun TripFilterSheet(
                 leadingIcon = {
                     Icon(
                         imageVector = androidx.compose.material.icons.Icons.Default.Search,
-                        contentDescription = "Search"
+                        contentDescription = "Search",
                     )
                 },
                 trailingIcon = if (state.tripSearchQuery.isNotEmpty()) {
@@ -103,28 +103,34 @@ fun TripFilterSheet(
                         IconButton(onClick = { onTripSearchChange("") }) {
                             Icon(
                                 imageVector = androidx.compose.material.icons.Icons.Default.Clear,
-                                contentDescription = "Clear"
+                                contentDescription = "Clear",
                             )
                         }
                     }
-                } else null,
+                } else {
+                    null
+                },
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                     disabledContainerColor = MaterialTheme.colorScheme.surface,
-                )
+                ),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(
                 modifier = Modifier.weight(1f, fill = false),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 24.dp, vertical = 8.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                    horizontal = 24.dp,
+                    vertical = 8.dp,
+                ),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                val needsFilter = state.selectedRouteIds.isEmpty() && state.tripSearchQuery.isBlank()
+                val needsFilter =
+                    state.selectedRouteIds.isEmpty() && state.tripSearchQuery.isBlank()
 
                 if (needsFilter) {
                     item {
@@ -132,20 +138,20 @@ fun TripFilterSheet(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 32.dp, horizontal = 16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                             Icon(
+                            Icon(
                                 imageVector = androidx.compose.material.icons.Icons.Default.Info,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(48.dp),
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "Select at least one route or enter a trip name to load trips.",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                         }
                     }
@@ -171,13 +177,13 @@ fun TripFilterSheet(
                             }
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Icon(
                                 imageVector = androidx.compose.material.icons.Icons.Default.Warning,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(48.dp),
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
@@ -192,9 +198,9 @@ fun TripFilterSheet(
                     }
                 } else if (trips.itemCount == 0) {
                     item {
-                         Column(
+                        Column(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = "No trips found",
@@ -214,7 +220,7 @@ fun TripFilterSheet(
                             )
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                                thickness = 0.5.dp
+                                thickness = 0.5.dp,
                             )
                         }
                     }
@@ -242,9 +248,9 @@ fun TripFilterSheet(
                             } else {
                                 "Failed to load more"
                             }
-                         Column(
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = message,

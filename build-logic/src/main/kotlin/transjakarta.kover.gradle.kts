@@ -24,7 +24,7 @@ kover {
                     "androidx.compose.ui.tooling.preview.Preview",
                     "androidx.compose.runtime.Composable",
                     "dagger.Module",
-                    "kotlinx.serialization.Serializable"
+                    "kotlinx.serialization.Serializable",
                 )
                 packages(
                     "*model*",

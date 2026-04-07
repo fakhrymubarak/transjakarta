@@ -81,6 +81,7 @@ class VehicleDetailViewModel @Inject constructor(
                         currentDetail = result.data
                         _uiState.value = UiState.Success(result.data.toUiModel())
                     }
+
                     else -> Unit // Ignore errors during polling.
                 }
             }

@@ -135,10 +135,12 @@ class FilterViewModel @Inject constructor(
                         allRoutes = result.data.map { it.toFilterOptionUiModel() }
                         updateFilteredRoutes()
                     }
+
                     is DomainResult.Empty -> {
                         allRoutes = emptyList()
                         updateFilteredRoutes()
                     }
+
                     is DomainResult.Error -> {
                         val message = result.message.ifBlank { "Failed to load routes" }
                         val friendly = if (result.isNetworkError) {

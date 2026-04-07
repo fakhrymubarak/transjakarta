@@ -41,7 +41,9 @@ fun RouteFilterSheet(
     modifier: Modifier = Modifier,
 ) {
     val filteredRoutes = state.routes
-    val sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = androidx.compose.material3.rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
 
     ModalBottomSheet(
         modifier = modifier,
@@ -84,7 +86,6 @@ fun RouteFilterSheet(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-
             when {
                 state.isRoutesLoading -> {
                     item {
@@ -144,7 +145,7 @@ internal fun FilterOptionRow(
     option: FilterOptionUiModel,
     selected: Boolean,
     onToggle: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -152,11 +153,11 @@ internal fun FilterOptionRow(
             .clickable(onClick = onToggle)
             .padding(vertical = 12.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         androidx.compose.material3.Checkbox(
             checked = selected,
-            onCheckedChange = null // Handled by Row click
+            onCheckedChange = null, // Handled by Row click
         )
         Text(
             text = option.label,

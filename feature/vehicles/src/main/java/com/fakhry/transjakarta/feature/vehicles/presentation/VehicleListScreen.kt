@@ -79,7 +79,7 @@ fun VehicleListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     "Vehicles",
@@ -184,6 +184,7 @@ private fun VehicleListContent(
                     }
                 }
             }
+
             // Initial error
             refreshState is LoadState.Error && lazyPagingItems.itemCount == 0 -> {
                 ErrorContent(
@@ -192,10 +193,12 @@ private fun VehicleListContent(
                     onRetry = { lazyPagingItems.retry() },
                 )
             }
+
             // Empty state
             refreshState is LoadState.NotLoading && lazyPagingItems.itemCount == 0 -> {
                 EmptyContent()
             }
+
             // Content loaded
             else -> {
                 LazyColumn(

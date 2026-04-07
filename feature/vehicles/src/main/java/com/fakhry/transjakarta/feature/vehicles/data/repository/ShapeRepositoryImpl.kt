@@ -14,7 +14,8 @@ class ShapeRepositoryImpl @Inject constructor(
     private val api: ShapeMbtaApiService,
     private val dispatchers: DispatcherProvider,
 ) : ShapeRepository {
-    override suspend fun getShapeById(id: String): DomainResult<Shape> = withContext(dispatchers.io) {
-        mapNetworkCall { api.getShape(id).data.toShape() }
-    }
+    override suspend fun getShapeById(id: String): DomainResult<Shape> =
+        withContext(dispatchers.io) {
+            mapNetworkCall { api.getShape(id).data.toShape() }
+        }
 }

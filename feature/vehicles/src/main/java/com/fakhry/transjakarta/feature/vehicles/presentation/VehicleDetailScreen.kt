@@ -62,12 +62,14 @@ fun VehicleDetailScreen(
         val contentModifier = Modifier.padding(innerPadding)
         when (uiState) {
             is UiState.Loading -> VehicleDetailPlaceholder(contentModifier)
+
             is UiState.Empty -> EmptyState(contentModifier, onRetry)
+
             is UiState.Error -> ErrorState(
                 contentModifier,
                 uiState.message,
                 uiState.isNetworkError,
-                onRetry
+                onRetry,
             )
 
             is UiState.Success -> SuccessState(contentModifier, uiState.data)

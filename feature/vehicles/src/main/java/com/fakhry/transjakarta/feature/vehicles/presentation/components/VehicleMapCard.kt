@@ -75,8 +75,8 @@ fun VehicleMapCard(
                 cameraPositionState.animate(
                     update = CameraUpdateFactory.newLatLngZoom(
                         vehicleLocation,
-                        15f
-                    )
+                        15f,
+                    ),
                 )
             }
 

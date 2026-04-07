@@ -56,7 +56,9 @@ class GetVehicleDetailWithRelationsUseCase @Inject constructor(
                     cause = vehicleResult.cause,
                     isNetworkError = vehicleResult.isNetworkError,
                 )
+
                 DomainResult.Empty -> DomainResult.Empty
+
                 is DomainResult.Success -> {
                     val vehicle = vehicleResult.data
                     val routeId = vehicle.routeId

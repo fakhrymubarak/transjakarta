@@ -54,11 +54,14 @@ class RouteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRouteById(id: String): DomainResult<Route> = withContext(dispatchers.io) {
-        cachedRoutes?.firstOrNull { it.id == id }?.let { return@withContext DomainResult.Success(it) }
+    override suspend fun getRouteById(id: String): DomainResult<Route> =
+        withContext(dispatchers.io) {
+            cachedRoutes?.firstOrNull {
+                it.id == id
+            }?.let { return@withContext DomainResult.Success(it) }
 
-        mapNetworkCall { api.getRoute(id).data.toRoute() }
-    }
+            mapNetworkCall { api.getRoute(id).data.toRoute() }
+        }
 
     companion object {
         private const val PAGE_SIZE = 100

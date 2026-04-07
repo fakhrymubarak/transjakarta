@@ -38,9 +38,6 @@ class CatalogDeps(
     }
 }
 
-fun DependencyHandlerScope.catalogDeps(
-    libs: VersionCatalog,
-    block: CatalogDeps.() -> Unit,
-) {
+fun DependencyHandlerScope.catalogDeps(libs: VersionCatalog, block: CatalogDeps.() -> Unit) {
     CatalogDeps(this, libs).block()
 }

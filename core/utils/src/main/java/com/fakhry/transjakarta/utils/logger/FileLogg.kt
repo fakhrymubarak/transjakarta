@@ -56,15 +56,13 @@ class FileLoggingTree(private val context: Context) : Timber.DebugTree() {
         }
     }
 
-    private fun priorityToString(priority: Int): String {
-        return when (priority) {
-            Log.VERBOSE -> "V"
-            Log.DEBUG -> "D"
-            Log.INFO -> "I"
-            Log.WARN -> "W"
-            Log.ERROR -> "E"
-            Log.ASSERT -> "A"
-            else -> "?"
-        }
+    private fun priorityToString(priority: Int): String = when (priority) {
+        Log.VERBOSE -> "V"
+        Log.DEBUG -> "D"
+        Log.INFO -> "I"
+        Log.WARN -> "W"
+        Log.ERROR -> "E"
+        Log.ASSERT -> "A"
+        else -> "?"
     }
 }

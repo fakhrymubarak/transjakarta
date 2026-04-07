@@ -30,7 +30,8 @@ class VehicleRepositoryImpl @Inject constructor(
         pagingSourceFactory = { VehiclePagingSource(api, filters) },
     ).flow
 
-    override suspend fun getVehicleDetail(id: String): DomainResult<VehicleDetail> = withContext(dispatchers.io) {
-        mapNetworkCall { api.getVehicle(id).data.toVehicleDetail() }
-    }
+    override suspend fun getVehicleDetail(id: String): DomainResult<VehicleDetail> =
+        withContext(dispatchers.io) {
+            mapNetworkCall { api.getVehicle(id).data.toVehicleDetail() }
+        }
 }

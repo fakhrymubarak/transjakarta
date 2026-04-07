@@ -33,7 +33,7 @@ dependencies {
             LibraryAliases.HILT_NAVIGATION_COMPOSE,
 
             // Collection Immutable
-            LibraryAliases.KOTLINX_COLLECTIONS_IMMUTABLE
+            LibraryAliases.KOTLINX_COLLECTIONS_IMMUTABLE,
         )
         debugImplementation(LibraryAliases.COMPOSE_UI_TOOLING)
     }

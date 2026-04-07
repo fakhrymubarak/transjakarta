@@ -9,13 +9,26 @@ class FilterOptionUiMapperTest {
 
     @Test
     fun `route maps to label preferring short name then long name then id`() {
-        val route = Route(id = "id-1", shortName = "short", longName = "long", directionDestinations = emptyList())
+        val route =
+            Route(
+                id = "id-1",
+                shortName = "short",
+                longName = "long",
+                directionDestinations = emptyList(),
+            )
         assertEquals("short", route.toFilterOptionUiModel().label)
 
-        val noShort = Route(id = "id-2", shortName = "", longName = "long", directionDestinations = emptyList())
+        val noShort =
+            Route(
+                id = "id-2",
+                shortName = "",
+                longName = "long",
+                directionDestinations = emptyList(),
+            )
         assertEquals("long", noShort.toFilterOptionUiModel().label)
 
-        val fallback = Route(id = "id-3", shortName = "", longName = "", directionDestinations = emptyList())
+        val fallback =
+            Route(id = "id-3", shortName = "", longName = "", directionDestinations = emptyList())
         assertEquals("id-3", fallback.toFilterOptionUiModel().label)
     }
 

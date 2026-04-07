@@ -36,8 +36,18 @@ class FilterViewModelTest {
         routeRepository = FakeRouteRepository(
             result = DomainResult.Success(
                 listOf(
-                    Route(id = "route-1", shortName = "1", longName = "Route One", directionDestinations = emptyList()),
-                    Route(id = "route-2", shortName = "2", longName = "Route Two", directionDestinations = emptyList()),
+                    Route(
+                        id = "route-1",
+                        shortName = "1",
+                        longName = "Route One",
+                        directionDestinations = emptyList(),
+                    ),
+                    Route(
+                        id = "route-2",
+                        shortName = "2",
+                        longName = "Route Two",
+                        directionDestinations = emptyList(),
+                    ),
                 ),
             ),
         )

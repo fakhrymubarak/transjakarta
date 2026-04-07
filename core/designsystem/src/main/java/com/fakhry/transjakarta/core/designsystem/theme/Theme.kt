@@ -54,6 +54,7 @@ fun TransjakartaTheme(
             }
 
             darkTheme -> DarkColorScheme
+
             else -> LightColorScheme
         }
 
