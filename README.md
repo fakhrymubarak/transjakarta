@@ -42,11 +42,15 @@ Built with modern Android development best practices:
 *   MBTA API Key
 
 ### Configuration
-1.  Create a `secret.properties` file in the root directory:
-    ```properties
-    MBTA_API_KEY=your_mbta_api_key_here    # Get one: https://api-v3.mbta.com/portal
-    GOOGLE_MAPS_API_KEY=your_maps_key_here # Get one: https://developers.google.com/maps/documentation/android-sdk/get-api-key
+1.  Copy the template and fill in your keys:
+    ```bash
+    cp secret.properties.example secret.properties
     ```
+    ```properties
+    MBTA_API_KEY=your_mbta_api_key_here   # Get one: https://api-v3.mbta.com/portal
+    MAPS_API_KEY=your_maps_api_key_here   # Get one: https://developers.google.com/maps/documentation/android-sdk/get-api-key
+    ```
+    `secret.properties` is git-ignored; never commit it.
 2.  Sync the project with Gradle.
 
 ### Build & Run
